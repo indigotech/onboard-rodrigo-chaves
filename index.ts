@@ -1,5 +1,5 @@
-import { ApolloServer, gql } from "apollo-server";
-import { ApolloServerPluginLandingPageLocalDefault } from "apollo-server-core";
+import { ApolloServer, gql } from 'apollo-server';
+import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 
 const typeDefs = gql`
   type Query {
@@ -9,7 +9,7 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    hello: () => "Hello World",
+    hello: () => 'Hello World',
   },
 };
 
@@ -17,7 +17,7 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
   csrfPrevention: true,
-  cache: "bounded",
+  cache: 'bounded',
   plugins: [ApolloServerPluginLandingPageLocalDefault({ embed: true })],
 });
 
