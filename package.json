@@ -1,0 +1,25 @@
+{
+  "name": "taqtile-onboard-project",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Project's Name: OnBoard BackEnd Rodrigo Chaves Project's Description: Projeto de backend no onBoard da TaqTile Environment and tools: Steps to run and debug:",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/indigotech/onboard-rodrigo-chaves.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/indigotech/onboard-rodrigo-chaves/issues"
+  },
+  "homepage": "https://github.com/indigotech/onboard-rodrigo-chaves#readme",
+  "dependencies": {
+    "express": "^4.18.1",
+    "express-graphql": "^0.12.0",
+    "graphql": "^16.6.0"
+  }
+}
