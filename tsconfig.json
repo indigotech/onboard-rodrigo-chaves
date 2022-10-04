@@ -1,16 +1,18 @@
 {
-    "compilerOptions": {
-      "target": "ES2022",
-      "module": "CommonJS",
-      "rootDir": ".",
+   "compilerOptions": {
+      "lib": [
+         "es5",
+         "es6"
+      ],
+      "target": "es5",
+      "module": "commonjs",
+      "moduleResolution": "node",
       "outDir": "./dist",
+      "rootDir": "./src",
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "strictPropertyInitialization": false,
       "sourceMap": true,
-      "noEmitOnError": true,
-      "esModuleInterop": true,
-      "forceConsistentCasingInFileNames": true,
-      "strict": true,
-      "types": [
-        "node"
-      ]
-    }
-  }
+      "strict": true
+   }
+}
