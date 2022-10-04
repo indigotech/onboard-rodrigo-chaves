@@ -1,0 +1,21 @@
+localdb:
+  image: postgres:11.2
+  ports:
+    - "5432:5432"
+  volumes:
+    - ./db/dumps:/app-db-dumps
+  environment:
+    - POSTGRES_USER=onboardRodrigo
+    - POSTGRES_PASSWORD=onboardRodrigo
+    - POSTGRES_DB=onboardRodrigo
+
+testdb:
+  image: postgres:11.2
+  ports:
+    - "5433:5432"
+  volumes:
+    - ./db/dumps:/app-db-dumps
+  environment:
+    - POSTGRES_USER=onboardRodrigoTest
+    - POSTGRES_PASSWORD=onboardRodrigoTest
+    - POSTGRES_DB=onboardRodrigoTest
