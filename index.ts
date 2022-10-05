@@ -8,9 +8,9 @@ const typeDefs = gql`
 `;
 
 const resolvers = {
-    Query: {
-      hello: () => 'Hello World'
-    }
+  Query: {
+    hello: () => 'Hello World',
+  },
 };
 
 const server = new ApolloServer({
@@ -18,9 +18,7 @@ const server = new ApolloServer({
   resolvers,
   csrfPrevention: true,
   cache: 'bounded',
-  plugins: [
-    ApolloServerPluginLandingPageLocalDefault({ embed: true })
-  ]
+  plugins: [ApolloServerPluginLandingPageLocalDefault({ embed: true })],
 });
 
 server.listen().then(({ url }) => {

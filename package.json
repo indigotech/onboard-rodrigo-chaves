@@ -4,7 +4,8 @@
   "description": "Project's Name: OnBoard BackEnd Rodrigo Chaves Project's Description: Projeto de backend no onBoard da TaqTile Environment and tools: Steps to run and debug:",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+   "lint": "npx eslint src/**",
+   "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,12 @@
     "graphql": "16.6.0"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "5.39.0",
+    "@typescript-eslint/parser": "5.39.0",
+    "eslint": "8.24.0",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-plugin-prettier": "4.2.1",
+    "prettier": "2.7.1",
     "typescript": "4.8.4"
   }
 }
