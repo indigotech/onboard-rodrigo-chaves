@@ -1,33 +1,40 @@
 {
-  "name": "taqtile-onboard-project",
-  "version": "1.0.0",
-  "description": "Project's Name: OnBoard BackEnd Rodrigo Chaves Project's Description: Projeto de backend no onBoard da TaqTile Environment and tools: Steps to run and debug:",
-  "main": "index.js",
-  "scripts": {
-   "lint": "npx eslint src/**",
-   "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/indigotech/onboard-rodrigo-chaves.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/indigotech/onboard-rodrigo-chaves/issues"
-  },
-  "homepage": "https://github.com/indigotech/onboard-rodrigo-chaves#readme",
-  "dependencies": {
-    "apollo-server": "3.10.2",
-    "graphql": "16.6.0"
-  },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "5.39.0",
-    "@typescript-eslint/parser": "5.39.0",
-    "eslint": "8.24.0",
-    "eslint-config-prettier": "8.5.0",
-    "eslint-plugin-prettier": "4.2.1",
-    "prettier": "2.7.1",
-    "typescript": "4.8.4"
-  }
+   "name": "taqtile-onboard-project",
+   "version": "1.0.0",
+   "description": "Project's Name: OnBoard BackEnd Rodrigo Chaves Project's Description: Projeto de backend no onBoard da TaqTile Environment and tools: Steps to run and debug:",
+   "main": "index.js",
+   "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "start": "ts-node src/index.ts",
+      "lint": "npx eslint src/**",
+      "typeorm": "typeorm-ts-node-commonjs"
+   },
+   "repository": {
+      "type": "git",
+      "url": "git+https://github.com/indigotech/onboard-rodrigo-chaves.git"
+   },
+   "author": "",
+   "license": "ISC",
+   "bugs": {
+      "url": "https://github.com/indigotech/onboard-rodrigo-chaves/issues"
+   },
+   "homepage": "https://github.com/indigotech/onboard-rodrigo-chaves#readme",
+   "dependencies": {
+      "apollo-server": "3.10.2",
+      "graphql": "16.6.0",
+      "pg": "8.4.0",
+      "reflect-metadata": "0.1.13",
+      "typeorm": "0.3.10"
+   },
+   "devDependencies": {
+      "@typescript-eslint/eslint-plugin": "5.39.0",
+      "@typescript-eslint/parser": "5.39.0",
+      "eslint": "8.24.0",
+      "eslint-config-prettier": "8.5.0",
+      "eslint-plugin-prettier": "4.2.1",
+      "prettier": "2.7.1",
+      "typescript": "4.5.2",
+      "ts-node": "10.7.0",
+      "@types/node": "16.11.10"
+   }
 }
