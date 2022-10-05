@@ -13,26 +13,50 @@ interface UserInput {
   birthdate: string;
 }
 
+function getUsers() {
+  return AppDataSource.manager.getRepository('user').find();
+}
+
+async function validateInputs(args: { input: UserInput }) {
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+
+  if (!passwordRegex.test(args.input.password)) {
+    throw new Error('Password must be at least 6 characters long, have at least 1 letter and 1 digit.');
+  }
+
+  const existentUserWithEmail = await AppDataSource.manager
+    .getRepository('user')
+    .findOneBy({ email: args.input.email });
+
+  if (existentUserWithEmail) {
+    throw new Error(`There is already a user registered with this email: ${args.input.email}.`);
+  }
+}
+
+async function createUser(parent: any, args: { input: UserInput }) {
+  await validateInputs(args);
+
+  const newUser = new User();
+
+  Object.assign(newUser, {
+    name: args.input.name,
+    email: args.input.email,
+    password: args.input.password,
+    birthdate: args.input.birthdate,
+  });
+
+  await AppDataSource.manager.save(newUser);
+
+  return newUser;
+}
+
 export async function initApolloServer() {
   const resolvers = {
     Query: {
-      users: () => AppDataSource.manager.getRepository('user').createQueryBuilder('user').getMany(),
+      users: getUsers,
     },
     Mutation: {
-      createUser: async (parent: any, args: UserInput) => {
-        const newUser = new User();
-
-        Object.assign(newUser, {
-          name: args.name,
-          email: args.email,
-          password: args.password,
-          birthdate: args.birthdate,
-        });
-
-        await AppDataSource.manager.save(newUser);
-
-        return newUser;
-      },
+      createUser,
     },
   };
 
