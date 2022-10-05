@@ -4,7 +4,8 @@
   "description": "Project's Name: OnBoard BackEnd Rodrigo Chaves Project's Description: Projeto de backend no onBoard da TaqTile Environment and tools: Steps to run and debug:",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+   "lint": "npx eslint src/**",
+   "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
