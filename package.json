@@ -1,11 +1,11 @@
 {
-   "name": "taqtile-onboard-project",
+   "name": "taqtile-onboard-project-rodrigo-chaves",
    "version": "1.0.0",
-   "description": "Project's Name: OnBoard BackEnd Rodrigo Chaves Project's Description: Projeto de backend no onBoard da TaqTile Environment and tools: Steps to run and debug:",
+   "description": "Projeto de backend no onBoard da TaqTile",
    "main": "index.js",
    "scripts": {
       "test": "echo \"Error: no test specified\" && exit 1",
-      "start": "ts-node src/apollo.ts",
+      "start": "ts-node src/index.ts",
       "lint": "npx eslint src/**",
       "typeorm": "typeorm-ts-node-commonjs"
    },
