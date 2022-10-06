@@ -13,7 +13,7 @@ interface UserInput {
   birthdate: string;
 }
 
-async function initApolloServer() {
+export async function initApolloServer() {
   const resolvers = {
     Query: {
       users: () => AppDataSource.manager.getRepository('user').createQueryBuilder('user').getMany(),
@@ -21,10 +21,13 @@ async function initApolloServer() {
     Mutation: {
       createUser: async (parent: any, args: UserInput) => {
         const newUser = new User();
-        newUser.name = args.name;
-        newUser.email = args.email;
-        newUser.password = args.password;
-        newUser.birthdate = args.birthdate;
+
+        Object.assign(newUser, {
+          name: args.name,
+          email: args.email,
+          password: args.password,
+          birthdate: args.birthdate,
+        });
 
         await AppDataSource.manager.save(newUser);
 
@@ -44,5 +47,3 @@ async function initApolloServer() {
   const serverInfo = await server.listen();
   console.log(`🚀  Server ready at ${serverInfo.url}`);
 }
-
-export { initApolloServer };

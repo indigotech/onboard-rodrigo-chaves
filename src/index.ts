@@ -1,5 +1,5 @@
 import { AppDataSource } from './data-source';
-import { initApolloServer } from './apolloServer';
+import { initApolloServer } from './apollo-server';
 
 AppDataSource.initialize()
   .then(initApolloServer)
