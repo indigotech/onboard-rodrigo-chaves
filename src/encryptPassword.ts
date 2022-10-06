@@ -1,11 +1,11 @@
 import * as bcrypt from 'bcrypt';
 
-function encryptPassword(password: string) {
-  return bcrypt.hashSync(password, 10);
+export async function encryptPassword(password: string) {
+  const hash = await bcrypt.hash(password, 10);
+  return hash;
 }
 
-function comparePassword(password: string, hash: string) {
-  return bcrypt.compareSync(password, hash);
+export async function comparePassword(password: string, hash: string) {
+  const result = await bcrypt.compare(password, hash);
+  return result;
 }
-
-export { encryptPassword, comparePassword };
