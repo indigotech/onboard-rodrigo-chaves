@@ -6,12 +6,20 @@ import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { User } from './entity/User';
 
 interface UserInput {
-  id?: number;
   name: string;
   email: string;
   password: string;
   birthdate: string;
 }
+
+const resolvers = {
+  Query: {
+    users: getUsers,
+  },
+  Mutation: {
+    createUser,
+  },
+};
 
 function getUsers() {
   return AppDataSource.manager.getRepository('user').find();
@@ -24,11 +32,9 @@ async function validateInputs(args: { input: UserInput }) {
     throw new Error('Password must be at least 6 characters long, have at least 1 letter and 1 digit.');
   }
 
-  const existentUserWithEmail = await AppDataSource.manager
-    .getRepository('user')
-    .findOneBy({ email: args.input.email });
+  const existentUser = await AppDataSource.manager.getRepository('user').findOneBy({ email: args.input.email });
 
-  if (existentUserWithEmail) {
+  if (existentUser) {
     throw new Error(`There is already a user registered with this email: ${args.input.email}.`);
   }
 }
@@ -51,15 +57,6 @@ async function createUser(parent: any, args: { input: UserInput }) {
 }
 
 export async function initApolloServer() {
-  const resolvers = {
-    Query: {
-      users: getUsers,
-    },
-    Mutation: {
-      createUser,
-    },
-  };
-
   const server = new ApolloServer({
     typeDefs: fs.readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8'),
     resolvers,
