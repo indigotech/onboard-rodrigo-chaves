@@ -65,6 +65,6 @@ export async function initApolloServer() {
     plugins: [ApolloServerPluginLandingPageLocalDefault({ embed: true })],
   });
 
-  const serverInfo = await server.listen();
+  const serverInfo = await server.listen({ port: process.env.APOLLO_SERVER_PORT || 4000 });
   console.log(`🚀  Server ready at ${serverInfo.url}`);
 }

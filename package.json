@@ -4,10 +4,10 @@
    "description": "Projeto de backend no onBoard da TaqTile",
    "main": "index.js",
    "scripts": {
-      "start": "ts-node src/index.ts",
+      "start": "set TEST=false && ts-node src/index.ts",
       "build": "tsc",
       "lint": "eslint src/**",
-      "test": "mocha test/**/*.spec.ts"
+      "test": "set TEST=true && mocha -r ts-node/register test/**/*.spec.ts"
    },
    "repository": {
       "type": "git",
@@ -21,7 +21,9 @@
    "homepage": "https://github.com/indigotech/onboard-rodrigo-chaves#readme",
    "dependencies": {
       "apollo-server": "3.10.2",
+      "axios": "1.1.2",
       "bcrypt": "5.0.1",
+      "dotenv": "16.0.3",
       "graphql": "16.6.0",
       "pg": "8.4.0",
       "reflect-metadata": "0.1.13",
