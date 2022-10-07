@@ -77,3 +77,32 @@ describe('CreateUser Mutation Test', () => {
     });
   });
 });
+
+describe('Axios Mutation Test', () => {
+  it('Mutation - Create a user and verify if the response is the same user informed in the input', async () => {
+    const query = `mutation CreateUser($input: UserInput){
+      createUser(input: $input) {
+        id, name, email, birthdate
+      }
+    }`;
+
+    const input = {
+      name: 'MochaUser',
+      email: 'mochauser@email.com',
+      password: 'mochauserPassword1',
+      birthdate: '01-01-1900',
+    };
+
+    const result = await connection.post('/graphql', {
+      query,
+      variables: { input },
+    });
+
+    const createdUser = result.data.data.createUser;
+
+    expect(createdUser.id).to.be.a('number');
+    expect(createdUser.name).to.be.equal(input.name);
+    expect(createdUser.email).to.be.equal(input.email);
+    expect(createdUser.birthdate).to.be.equal(input.birthdate);
+  });
+});
