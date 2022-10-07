@@ -4,6 +4,7 @@ import { AppDataSource } from './data-source';
 import { ApolloServer } from 'apollo-server';
 import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { User } from './entity/User';
+import { encryptPassword } from './encryptPassword';
 
 interface UserInput {
   name: string;
@@ -47,7 +48,7 @@ async function createUser(parent: any, args: { input: UserInput }) {
   Object.assign(newUser, {
     name: args.input.name,
     email: args.input.email,
-    password: args.input.password,
+    password: await encryptPassword(args.input.password),
     birthdate: args.input.birthdate,
   });
 
