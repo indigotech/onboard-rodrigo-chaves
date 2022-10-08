@@ -1,10 +1,15 @@
 import { User } from './entity/User';
 import { AppDataSource } from './data-source';
 import { encryptPassword } from './encryptPassword';
+<<<<<<< HEAD
 import { ExistentEmailError } from './errors/ExistentEmailError';
 import { PasswordInvalidError } from './errors/PasswordInvalidError';
 
 export interface UserInput {
+=======
+
+interface UserInput {
+>>>>>>> 486504a (Added error handling in ApolloServer setup, also new tests considering these errors.)
   name: string;
   email: string;
   password: string;
@@ -15,6 +20,7 @@ async function validateInputs(args: { input: UserInput }) {
   const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
 
   if (!passwordRegex.test(args.input.password)) {
+<<<<<<< HEAD
     throw new PasswordInvalidError('Password must be at least 6 characters long, have at least 1 letter and 1 digit.');
   }
 
@@ -22,6 +28,15 @@ async function validateInputs(args: { input: UserInput }) {
 
   if (existentUser) {
     throw new ExistentEmailError(`There is already a user registered with this email: ${args.input.email}.`);
+=======
+    throw new Error('Password must be at least 6 characters long, have at least 1 letter and 1 digit.');
+  }
+
+  const existentUser = await AppDataSource.manager.getRepository('user').findOneBy({ email: args.input.email });
+
+  if (existentUser) {
+    throw new Error(`There is already a user registered with this email: ${args.input.email}.`);
+>>>>>>> 486504a (Added error handling in ApolloServer setup, also new tests considering these errors.)
   }
 }
 
@@ -43,7 +58,11 @@ async function createUser(parent: any, args: { input: UserInput }) {
 }
 
 function getUsers() {
+<<<<<<< HEAD
   return AppDataSource.manager.getRepository(User).find();
+=======
+  return AppDataSource.manager.getRepository('user').find();
+>>>>>>> 486504a (Added error handling in ApolloServer setup, also new tests considering these errors.)
 }
 
 export const resolvers = {
