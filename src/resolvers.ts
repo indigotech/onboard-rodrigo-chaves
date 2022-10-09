@@ -3,6 +3,8 @@ import { AppDataSource } from './data-source';
 import { comparePassword, encryptPassword } from './encryptPassword';
 import { ConflictError } from './errors/conflict.error';
 import { BadRequestError } from './errors/bad-request.error';
+import { NotFoundError } from './errors/not-found.error';
+import { UnauthorizedError } from './errors/unauthorized.error';
 
 export interface UserInput {
   name: string;
@@ -29,11 +31,11 @@ async function login(parent: any, args: { email: string; password: string }) {
   const existentUser = await AppDataSource.manager.getRepository(User).findOneBy({ email: args.email });
 
   if (!existentUser) {
-    throw new Error(`Email: '${args.email}' does not exist.`);
+    throw new NotFoundError(`Email: '${args.email}' does not exist.`);
   }
 
   if (!(await comparePassword(args.password, existentUser.password))) {
-    throw new Error(`Password incorrect.`);
+    throw new UnauthorizedError(`Password incorrect.`);
   }
 
   return { user: existentUser, token: 'the_token' };

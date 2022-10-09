@@ -33,3 +33,24 @@ export async function mutationCreateUser(connection: AxiosInstance, newUser: Use
 
   return result.data;
 }
+
+export async function mutationLogin(connection: AxiosInstance, email: string, password: string) {
+  const query = `mutation Login($email: String!, $password: String!) {
+                    login(email: $email, password: $password) {
+                      user {
+                        id
+                        name
+                        email
+                        birthdate
+                      },
+                      token
+                    }
+                  }`;
+
+  const result = await connection.post('/graphql', {
+    query,
+    variables: { email, password },
+  });
+
+  return result.data;
+}

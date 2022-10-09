@@ -7,20 +7,17 @@ import { initApolloServer } from '../src/apollo-server';
 import { AppDataSource } from '../src/data-source';
 import { User } from '../src/entity/User';
 import { comparePassword } from '../src/encryptPassword';
-import { mutationCreateUser, queryUser } from './queries';
+import { mutationCreateUser, mutationLogin, queryUser } from './queries';
 import { UserInput } from './resolvers';
-import { ConflictError } from './errors/conflict.error';
-import { BadRequestError } from './errors/bad-request.error';
+import { ConflictError } from '../src/errors/conflict.error';
+import { BadRequestError } from '../src/errors/bad-request.error';
+import { NotFoundError } from '../src/errors/not-found.error';
+import { UnauthorizedError } from '../src/errors/unauthorized.error';
 
 interface ApolloErrorFormat {
   message: string;
   code: number;
   details: string;
-}
-
-interface ApolloErrorFormat {
-  message: string;
-  extensions: { code: string };
 }
 
 const connection = axios.create({ baseURL: `http://localhost:${process.env.APOLLO_SERVER_PORT}` });
@@ -107,36 +104,67 @@ describe('CreateUser Mutation Test', () => {
   });
 });
 
-//Temporary test for login, it compares to a specific return, it will be changed in the next PR's.
-describe('Login Mutation test - Return', () => {
-  it('Should return be equal input', async () => {
-    const query = `mutation($email: String!, $password: String!) {
-      login(email: $email, password: $password) {
-        user {
-          id
-          name
-          email
-          birthdate
-        },
-        token
-      }
-    }`;
-
-    const email = 'mochauser@email.com';
-    const password = 'mochauserPassword1';
-
-    const result = await connection.post('/graphql', {
-      query,
-      variables: { email, password },
-    });
-
-    const loginResponse = {
-      id: 12,
-      name: 'Rodrigo',
-      email: 'rodrigo@email.com',
-      birthdate: '01-01-1980',
+describe('Login Mutation Test', () => {
+  it('Should return be the user that has the same email from input and a token', async () => {
+    const input = {
+      name: 'MochaUser1',
+      email: 'mochauser1@email.com',
+      password: 'mochauserPassword1',
+      birthdate: '01-01-2000',
     };
 
-    expect(JSON.stringify(result.data.data.login.user)).to.be.equal(JSON.stringify(loginResponse));
+    await mutationCreateUser(connection, input);
+    const userInDatabase = await AppDataSource.getRepository(User).findOneBy({ email: input.email });
+
+    const loginResult = (await mutationLogin(connection, input.email, input.password)).data.login;
+
+    expect(loginResult.user).to.be.deep.eq({
+      id: userInDatabase.id,
+      name: input.name,
+      email: input.email,
+      birthdate: input.birthdate,
+    });
+
+    expect(loginResult.token).to.be.a('string');
+    expect(loginResult.token.length).to.be.gt(0);
+
+    after(async () => {
+      await AppDataSource.getRepository(User).delete({ email: input.email });
+    });
+  });
+
+  it('Should return an error when trying to login with a non-existent email', async () => {
+    const apolloErrors = (await mutationLogin(connection, 'mochauserNotExistent@email.com', 'SomePassword1'))
+      .errors as ApolloErrorFormat[];
+
+    const mailNotFoundError = new NotFoundError('');
+    const hasNotFoundEmailError = apolloErrors.some((error) => error.code === mailNotFoundError.code);
+
+    expect(apolloErrors.length).to.be.gt(0);
+    expect(hasNotFoundEmailError).to.be.true;
+  });
+
+  it('Should return an error when trying to login with an incorrect password', async () => {
+    const input = {
+      name: 'MochaUser3',
+      email: 'mochauser3@email.com',
+      password: 'mochauserPassword3',
+      birthdate: '01-01-2000',
+    };
+
+    await mutationCreateUser(connection, input);
+
+    const apolloErrors = (await mutationLogin(connection, input.email, 'mochauserPassword123'))
+      .errors as ApolloErrorFormat[];
+
+    const passwordIncorrectError = new UnauthorizedError('');
+    const hasPasswordIncorrectError = apolloErrors.some((error) => error.code === passwordIncorrectError.code);
+
+    expect(apolloErrors.length).to.be.gt(0);
+    expect(hasPasswordIncorrectError).to.be.true;
+
+    after(async () => {
+      await AppDataSource.getRepository(User).delete({ email: input.email });
+    });
   });
 });

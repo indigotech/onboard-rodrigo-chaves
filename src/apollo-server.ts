@@ -5,6 +5,8 @@ import { resolvers } from './resolvers';
 import { GraphQLError } from 'graphql';
 import { ConflictError } from './errors/conflict.error';
 import { BadRequestError } from './errors/bad-request.error';
+import { NotFoundError } from './errors/not-found.error';
+import { UnauthorizedError } from './errors/unauthorized.error';
 
 function formatError(error: GraphQLError) {
   const errorObj = {
@@ -13,7 +15,12 @@ function formatError(error: GraphQLError) {
     details: '',
   };
 
-  if (error.originalError instanceof ConflictError || error.originalError instanceof BadRequestError) {
+  if (
+    error.originalError instanceof ConflictError ||
+    error.originalError instanceof BadRequestError ||
+    error.originalError instanceof NotFoundError ||
+    error.originalError instanceof UnauthorizedError
+  ) {
     errorObj.message = error.message;
     errorObj.code = error.originalError.code;
 
