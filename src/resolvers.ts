@@ -5,6 +5,7 @@ import { ConflictError } from './errors/conflict.error';
 import { BadRequestError } from './errors/bad-request.error';
 import { NotFoundError } from './errors/not-found.error';
 import { UnauthorizedError } from './errors/unauthorized.error';
+import { generateToken } from './jwt-utils';
 
 export interface UserInput {
   name: string;
@@ -38,7 +39,7 @@ async function login(parent: any, args: { email: string; password: string }) {
     throw new UnauthorizedError(`Password incorrect.`);
   }
 
-  return { user: existentUser, token: 'the_token' };
+  return { user: existentUser, token: generateToken(existentUser) };
 }
 
 async function createUser(parent: any, args: { input: UserInput }) {
