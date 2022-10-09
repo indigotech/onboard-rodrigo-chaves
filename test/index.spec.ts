@@ -161,3 +161,34 @@ describe('Axios Mutation Test - Password Invalid', () => {
     expect(emailError.message).to.be.equal(passwordErrorMessage);
   });
 });
+
+//Temporary test for login, it compares to a specific return, it will be changed in the next PR's.
+describe('Login Mutation test - Return', () => {
+  it('Login Mutation - verify return of login', async () => {
+    const query = `mutation($email: String!, $password: String!) {
+      login(email: $email, password: $password) {
+        user {
+          id, name, email, birthdate
+        },
+        token
+      }
+    }`;
+
+    const email = 'mochauser@email.com';
+    const password = 'mochauserPassword1';
+
+    const result = await connection.post('/graphql', {
+      query,
+      variables: { email, password },
+    });
+
+    const loginResponse = {
+      id: 12,
+      name: 'Rodrigo',
+      email: 'rodrigo@email.com',
+      birthdate: '01-01-1980',
+    };
+
+    expect(JSON.stringify(result.data.data.login.user)).to.be.equal(JSON.stringify(loginResponse));
+  });
+});
