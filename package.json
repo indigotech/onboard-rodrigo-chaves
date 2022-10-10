@@ -5,9 +5,9 @@
    "main": "index.js",
    "scripts": {
       "start": "ts-node src/index.ts",
-      "build": "npx tsc",
-      "lint": "npx eslint src/**",
-      "test": "npx mocha test/**/*.spec.ts"
+      "build": "tsc",
+      "lint": "eslint src/**",
+      "test": "mocha test/**/*.spec.ts"
    },
    "repository": {
       "type": "git",
