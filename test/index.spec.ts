@@ -55,7 +55,7 @@ describe('CreateUser Mutation Test', () => {
     });
 
     const createdUser = result.data.data.createUser;
-    const userInDatabase = (await AppDataSource.getRepository('user').findOneBy({ email: input.email })) as User;
+    const userInDatabase = await AppDataSource.getRepository(User).findOneBy({ email: input.email });
 
     const isSamePassword = await comparePassword(input.password, userInDatabase.password);
 
@@ -73,7 +73,7 @@ describe('CreateUser Mutation Test', () => {
     });
 
     after(async () => {
-      await AppDataSource.getRepository('user').delete({ email: input.email });
+      await AppDataSource.getRepository(User).delete({ email: input.email });
     });
   });
 });
