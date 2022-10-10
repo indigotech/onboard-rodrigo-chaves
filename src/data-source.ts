@@ -3,7 +3,7 @@ import { DataSource } from 'typeorm';
 import { User } from './entity/User';
 import * as dotenv from 'dotenv';
 
-dotenv.config({ path: `${__dirname}/../.env` });
+dotenv.config({ path: `${process.cwd()}/.env` });
 
 const env = process.env;
 

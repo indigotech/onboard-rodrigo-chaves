@@ -1,5 +1,5 @@
 import * as dotenv from 'dotenv';
-dotenv.config({ path: `${__dirname}/../test.env` });
+dotenv.config({ path: `${process.cwd()}/test.env` });
 
 import axios from 'axios';
 import { expect } from 'chai';
