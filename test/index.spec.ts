@@ -16,7 +16,12 @@ before(async () => {
 describe('Users Query Test', () => {
   it('Should bring number of users from database if server is online', async () => {
     const query = `query User{
-      users{id, name, email, birthdate}
+      users{
+        id
+        name
+        email
+        birthdate
+      }
     }`;
 
     const result = await connection.post('/graphql', { query });
@@ -28,7 +33,10 @@ describe('CreateUser Mutation Test', () => {
   it('Should result have the same data taht was informed in the input', async () => {
     const query = `mutation CreateUser($input: UserInput){
       createUser(input: $input) {
-        id, name, email, birthdate
+        id
+        name
+        email
+        birthdate
       }
     }`;
 
