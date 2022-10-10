@@ -13,7 +13,7 @@ before(async () => {
   await initApolloServer();
 });
 
-describe('Axios Query', () => {
+describe('Users Query Test', () => {
   it('Query - Should bring number of users from database if server is online', async () => {
     const query = `query User{
       users{id, name, email, birthdate}
@@ -24,7 +24,7 @@ describe('Axios Query', () => {
   });
 });
 
-describe('Axios Mutation Test', () => {
+describe('CreateUser Mutation Test', () => {
   it('Mutation - Create a user and verify if the response is the same user informed in the input', async () => {
     const query = `mutation CreateUser($input: UserInput){
       createUser(input: $input) {
