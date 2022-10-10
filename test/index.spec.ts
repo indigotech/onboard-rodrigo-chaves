@@ -5,6 +5,8 @@ import axios from 'axios';
 import { expect } from 'chai';
 import { initApolloServer } from '../src/apollo-server';
 import { AppDataSource } from '../src/data-source';
+import { User } from '../src/entity/User';
+import { comparePassword } from '../src/encryptPassword';
 
 const connection = axios.create({ baseURL: `http://localhost:${process.env.APOLLO_SERVER_PORT}` });
 
@@ -30,7 +32,7 @@ describe('Users Query Test', () => {
 });
 
 describe('CreateUser Mutation Test', () => {
-  it('Should result have the same data taht was informed in the input', async () => {
+  it('Should result have the same data that was informed in the input', async () => {
     const query = `mutation CreateUser($input: UserInput){
       createUser(input: $input) {
         id
@@ -53,10 +55,25 @@ describe('CreateUser Mutation Test', () => {
     });
 
     const createdUser = result.data.data.createUser;
+    const userInDatabase = (await AppDataSource.getRepository('user').findOneBy({ email: input.email })) as User;
 
-    expect(createdUser.id).to.be.a('number');
-    expect(createdUser.name).to.be.equal(input.name);
-    expect(createdUser.email).to.be.equal(input.email);
-    expect(createdUser.birthdate).to.be.equal(input.birthdate);
+    const isSamePassword = await comparePassword(input.password, userInDatabase.password);
+
+    expect(userInDatabase.id).to.be.gt(0);
+    expect(userInDatabase.name).to.be.eq(input.name);
+    expect(userInDatabase.email).to.be.eq(input.email);
+    expect(isSamePassword).to.be.true;
+    expect(userInDatabase.birthdate).to.be.eq(input.birthdate);
+
+    expect(createdUser).to.be.deep.eq({
+      id: userInDatabase.id,
+      name: input.name,
+      email: input.email,
+      birthdate: input.birthdate,
+    });
+
+    after(async () => {
+      await AppDataSource.getRepository('user').delete({ email: input.email });
+    });
   });
 });
