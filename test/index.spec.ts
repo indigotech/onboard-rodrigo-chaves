@@ -1,3 +1,6 @@
+import * as dotenv from 'dotenv';
+dotenv.config({ path: `${process.cwd()}/test.env` });
+
 import axios from 'axios';
 import { expect } from 'chai';
 import { initApolloServer } from '../src/apollo-server';
