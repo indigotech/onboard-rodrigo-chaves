@@ -5,8 +5,13 @@
    "main": "index.js",
    "scripts": {
       "start": "set TEST=false && ts-node src/index.ts",
+<<<<<<< HEAD
       "build": "tsc",
       "lint": "eslint src/**",
+=======
+      "build": "npx tsc",
+      "lint": "npx eslint src/**",
+>>>>>>> 4bd879e (Added axios testing to see if server and database are online.)
       "test": "set TEST=true && mocha -r ts-node/register test/**/*.spec.ts"
    },
    "repository": {
@@ -31,10 +36,12 @@
    },
    "devDependencies": {
       "@types/bcrypt": "5.0.0",
+      "@types/chai": "4.3.3",
       "@types/mocha": "10.0.0",
       "@types/node": "16.11.10",
       "@typescript-eslint/eslint-plugin": "5.39.0",
       "@typescript-eslint/parser": "5.39.0",
+      "chai": "4.3.6",
       "eslint": "8.24.0",
       "eslint-config-prettier": "8.5.0",
       "eslint-plugin-prettier": "4.2.1",

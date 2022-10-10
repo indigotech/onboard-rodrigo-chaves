@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { expect } from 'chai';
 import { initApolloServer } from '../src/apollo-server';
 import { AppDataSource } from '../src/data-source';
 
@@ -16,6 +17,6 @@ describe('Axios Test', () => {
     const connection = axios.create({ baseURL: `http://localhost:${process.env.APOLLO_SERVER_PORT}` });
 
     const result = await connection.post('/graphql', { query });
-    console.log(JSON.stringify(result.data));
+    expect(result.data.data.users.length).to.be.eq(5);
   });
 });
