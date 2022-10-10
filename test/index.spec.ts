@@ -18,6 +18,5 @@ describe('Axios Test', () => {
 
     const result = await connection.post('/graphql', { query });
     expect(result.data.data.users.length).to.be.eq(5);
-    // console.log(JSON.stringify(result.data.data.users));
   });
 });
