@@ -1,40 +1,69 @@
 import * as fs from 'fs';
+import * as path from 'path';
+import { AppDataSource } from './data-source';
 import { ApolloServer } from 'apollo-server';
 import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
-import { resolvers } from './resolvers';
-import { GraphQLError } from 'graphql';
-import { ExistentEmailError } from './errors/ExistentEmailError';
-import { PasswordInvalidError } from './errors/PasswordInvalidError';
+import { User } from './entity/User';
+import { encryptPassword } from './encryptPassword';
 
-function formatError(error: GraphQLError) {
-  const errorObj = {
-    message: '',
-    code: 0,
-    details: '',
-  };
+interface UserInput {
+  name: string;
+  email: string;
+  password: string;
+  birthdate: string;
+}
 
-  if (error.originalError instanceof ExistentEmailError || error.originalError instanceof PasswordInvalidError) {
-    errorObj.message = error.message;
-    errorObj.code = error.originalError.code;
+const resolvers = {
+  Query: {
+    users: getUsers,
+  },
+  Mutation: {
+    createUser,
+  },
+};
 
-    return errorObj;
+function getUsers() {
+  return AppDataSource.manager.getRepository(User).find();
+}
+
+async function validateInputs(args: { input: UserInput }) {
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+
+  if (!passwordRegex.test(args.input.password)) {
+    throw new Error('Password must be at least 6 characters long, have at least 1 letter and 1 digit.');
   }
 
-  errorObj.message = 'Internal server error, please try again';
-  errorObj.code = 500;
-  errorObj.details = error.message;
+  const existentUser = await AppDataSource.manager.getRepository(User).findOneBy({ email: args.input.email });
 
-  return errorObj;
+  if (existentUser) {
+    throw new Error(`There is already a user registered with this email: ${args.input.email}.`);
+  }
+}
+
+async function createUser(parent: any, args: { input: UserInput }) {
+  await validateInputs(args);
+
+  const newUser = new User();
+
+  Object.assign(newUser, {
+    name: args.input.name,
+    email: args.input.email,
+    password: await encryptPassword(args.input.password),
+    birthdate: args.input.birthdate,
+  });
+
+  await AppDataSource.manager.save(newUser);
+
+  return newUser;
 }
 
 export async function initApolloServer() {
   const server = new ApolloServer({
-    typeDefs: fs.readFileSync(`${process.cwd()}/src/schema.graphql`, 'utf8'),
+    typeDefs: fs.readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8'),
     resolvers,
     csrfPrevention: true,
     cache: 'bounded',
     plugins: [ApolloServerPluginLandingPageLocalDefault({ embed: true })],
-    formatError,
   });
 
   const serverInfo = await server.listen({ port: process.env.APOLLO_SERVER_PORT || 4000 });
