@@ -13,7 +13,7 @@ export async function queryUser(connection: AxiosInstance) {
 
   const result = await connection.post('/graphql', { query });
 
-  return result.data.data;
+  return result.data;
 }
 
 export async function mutationCreateUser(connection: AxiosInstance, newUser: UserInput) {
@@ -31,5 +31,5 @@ export async function mutationCreateUser(connection: AxiosInstance, newUser: Use
     variables: { input: newUser },
   });
 
-  return result.data.data;
+  return result.data;
 }

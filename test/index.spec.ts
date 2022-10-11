@@ -24,8 +24,8 @@ before(async () => {
 
 describe('Users Query Test', () => {
   it('Should bring number of users from database if server is online', async () => {
-    const result = (await queryUser(connection)).users as UserInput[];
-    expect(result.length).to.be.eq(5);
+    const result = (await queryUser(connection)).data.users as UserInput[];
+    expect(result.length).to.be.gt(0);
   });
 });
 
@@ -38,7 +38,7 @@ describe('CreateUser Mutation Test', () => {
       birthdate: '01-01-1993',
     };
 
-    const createdUser = (await mutationCreateUser(connection, input)).createUser as UserInput;
+    const createdUser = (await mutationCreateUser(connection, input)).data.createUser as UserInput;
     const userInDatabase = await AppDataSource.getRepository(User).findOneBy({ email: input.email });
 
     const isSamePassword = await comparePassword(input.password, userInDatabase.password);
@@ -71,7 +71,7 @@ describe('CreateUser Mutation Test', () => {
 
     await mutationCreateUser(connection, input);
     const apolloErrors = (await mutationCreateUser(connection, input)).errors as ApolloErrorFormat[];
-    const hasDuplicatedEmailError = apolloErrors.find((error) => error.extensions.code === '409');
+    const hasDuplicatedEmailError = apolloErrors.some((error) => error.extensions.code === '409');
 
     expect(apolloErrors.length).to.be.gt(0);
     expect(hasDuplicatedEmailError).to.be.true;
@@ -90,7 +90,7 @@ describe('CreateUser Mutation Test', () => {
     };
 
     const apolloErrors = (await mutationCreateUser(connection, input)).errors as ApolloErrorFormat[];
-    const hasInvalidPasswordError = apolloErrors.find((error) => error.extensions.code === '400');
+    const hasInvalidPasswordError = apolloErrors.some((error) => error.extensions.code === '400');
 
     expect(apolloErrors.length).to.be.gt(0);
     expect(hasInvalidPasswordError).to.be.true;
