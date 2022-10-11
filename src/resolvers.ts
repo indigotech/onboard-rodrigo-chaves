@@ -1,6 +1,8 @@
 import { User } from './entity/User';
 import { AppDataSource } from './data-source';
 import { encryptPassword } from './encryptPassword';
+import { ExistentEmailError } from './errors/ExistentEmailError';
+import { PasswordInvalidError } from './errors/PasswordInvalidError';
 
 interface UserInput {
   name: string;
@@ -13,13 +15,13 @@ async function validateInputs(args: { input: UserInput }) {
   const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
 
   if (!passwordRegex.test(args.input.password)) {
-    throw new Error('Password must be at least 6 characters long, have at least 1 letter and 1 digit.');
+    throw new PasswordInvalidError('Password must be at least 6 characters long, have at least 1 letter and 1 digit.');
   }
 
   const existentUser = await AppDataSource.manager.getRepository('user').findOneBy({ email: args.input.email });
 
   if (existentUser) {
-    throw new Error(`There is already a user registered with this email: ${args.input.email}.`);
+    throw new ExistentEmailError(`There is already a user registered with this email: ${args.input.email}.`);
   }
 }
 
@@ -41,7 +43,7 @@ async function createUser(parent: any, args: { input: UserInput }) {
 }
 
 function getUsers() {
-  return AppDataSource.manager.getRepository('user').find();
+  return AppDataSource.manager.getRepository(User).find();
 }
 
 export const resolvers = {
