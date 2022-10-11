@@ -4,7 +4,7 @@ import { encryptPassword } from './encryptPassword';
 import { ExistentEmailError } from './errors/ExistentEmailError';
 import { PasswordInvalidError } from './errors/PasswordInvalidError';
 
-interface UserInput {
+export interface UserInput {
   name: string;
   email: string;
   password: string;
