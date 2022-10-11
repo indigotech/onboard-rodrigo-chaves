@@ -1,7 +1,9 @@
-import { ApolloError } from 'apollo-server-errors';
+export class ExistentEmailError extends Error {
+  public details?: string;
+  public readonly code: number;
 
-export class ExistentEmailError extends ApolloError {
   constructor(message: string) {
-    super(message, '409');
+    super(message);
+    this.code = 409;
   }
 }
