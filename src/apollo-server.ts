@@ -1,17 +1,35 @@
 import * as fs from 'fs';
-import * as path from 'path';
 import { ApolloServer } from 'apollo-server';
 import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { resolvers } from './resolvers';
 import { GraphQLError } from 'graphql';
+import { ExistentEmailError } from './errors/ExistentEmailError';
+import { PasswordInvalidError } from './errors/PasswordInvalidError';
 
 function formatError(error: GraphQLError) {
-  return error;
+  const errorObj = {
+    message: '',
+    code: 0,
+    details: '',
+  };
+
+  if (error.originalError instanceof ExistentEmailError || error.originalError instanceof PasswordInvalidError) {
+    errorObj.message = error.message;
+    errorObj.code = error.originalError.code;
+
+    return errorObj;
+  }
+
+  errorObj.message = 'Internal server error, please try again';
+  errorObj.code = 500;
+  errorObj.details = error.message;
+
+  return errorObj;
 }
 
 export async function initApolloServer() {
   const server = new ApolloServer({
-    typeDefs: fs.readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8'),
+    typeDefs: fs.readFileSync(`${process.cwd()}/src/schema.graphql`, 'utf8'),
     resolvers,
     csrfPrevention: true,
     cache: 'bounded',

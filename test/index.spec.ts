@@ -9,10 +9,13 @@ import { User } from '../src/entity/User';
 import { comparePassword } from '../src/encryptPassword';
 import { mutationCreateUser, queryUser } from './queries';
 import { UserInput } from './resolvers';
+import { ExistentEmailError } from '../src/errors/ExistentEmailError';
+import { PasswordInvalidError } from '../src/errors/PasswordInvalidError';
 
 interface ApolloErrorFormat {
   message: string;
-  extensions: { code: string };
+  code: number;
+  details: string;
 }
 
 const connection = axios.create({ baseURL: `http://localhost:${process.env.APOLLO_SERVER_PORT}` });
@@ -71,7 +74,8 @@ describe('CreateUser Mutation Test', () => {
 
     await mutationCreateUser(connection, input);
     const apolloErrors = (await mutationCreateUser(connection, input)).errors as ApolloErrorFormat[];
-    const hasDuplicatedEmailError = apolloErrors.some((error) => error.extensions.code === '409');
+    const mailError = new ExistentEmailError('');
+    const hasDuplicatedEmailError = apolloErrors.some((error) => error.code === mailError.code);
 
     expect(apolloErrors.length).to.be.gt(0);
     expect(hasDuplicatedEmailError).to.be.true;
@@ -90,7 +94,8 @@ describe('CreateUser Mutation Test', () => {
     };
 
     const apolloErrors = (await mutationCreateUser(connection, input)).errors as ApolloErrorFormat[];
-    const hasInvalidPasswordError = apolloErrors.some((error) => error.extensions.code === '400');
+    const passwordError = new PasswordInvalidError('');
+    const hasInvalidPasswordError = apolloErrors.some((error) => error.code === passwordError.code);
 
     expect(apolloErrors.length).to.be.gt(0);
     expect(hasInvalidPasswordError).to.be.true;
