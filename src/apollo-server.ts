@@ -4,20 +4,8 @@ import { ApolloServer } from 'apollo-server';
 import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { resolvers } from './resolvers';
 import { GraphQLError } from 'graphql';
-import { PasswordInvalidError } from './errors/PasswordInvalidError';
-import { ExistentEmailError } from './errors/ExistentEmailError';
 
 function formatError(error: GraphQLError) {
-  const errorMsg = error.originalError.message;
-
-  if (errorMsg.startsWith('Password')) {
-    return new PasswordInvalidError(errorMsg);
-  }
-
-  if (errorMsg.startsWith('There is already')) {
-    return new ExistentEmailError(errorMsg);
-  }
-
   return error;
 }
 
