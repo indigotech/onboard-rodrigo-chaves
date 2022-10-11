@@ -4,6 +4,7 @@ import { AppDataSource } from './data-source';
 import { ApolloServer } from 'apollo-server';
 import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { User } from './entity/User';
+import { encryptPassword } from './encryptPassword';
 
 interface UserInput {
   name: string;
@@ -22,7 +23,7 @@ const resolvers = {
 };
 
 function getUsers() {
-  return AppDataSource.manager.getRepository('user').find();
+  return AppDataSource.manager.getRepository(User).find();
 }
 
 async function validateInputs(args: { input: UserInput }) {
@@ -32,7 +33,7 @@ async function validateInputs(args: { input: UserInput }) {
     throw new Error('Password must be at least 6 characters long, have at least 1 letter and 1 digit.');
   }
 
-  const existentUser = await AppDataSource.manager.getRepository('user').findOneBy({ email: args.input.email });
+  const existentUser = await AppDataSource.manager.getRepository(User).findOneBy({ email: args.input.email });
 
   if (existentUser) {
     throw new Error(`There is already a user registered with this email: ${args.input.email}.`);
@@ -47,7 +48,7 @@ async function createUser(parent: any, args: { input: UserInput }) {
   Object.assign(newUser, {
     name: args.input.name,
     email: args.input.email,
-    password: args.input.password,
+    password: await encryptPassword(args.input.password),
     birthdate: args.input.birthdate,
   });
 
