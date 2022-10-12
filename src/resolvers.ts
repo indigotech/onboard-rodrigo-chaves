@@ -14,6 +14,12 @@ export interface UserInput {
   birthdate: string;
 }
 
+export interface LoginInput {
+  email: string;
+  password: string;
+  rememberMe: boolean;
+}
+
 async function validateInputs(email: string, password: string) {
   const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
 
@@ -28,18 +34,18 @@ async function validateInputs(email: string, password: string) {
   }
 }
 
-async function login(parent: any, args: { email: string; password: string }) {
-  const existentUser = await AppDataSource.manager.getRepository(User).findOneBy({ email: args.email });
+async function login(parent: any, args: { input: LoginInput }) {
+  const existentUser = await AppDataSource.manager.getRepository(User).findOneBy({ email: args.input.email });
 
   if (!existentUser) {
-    throw new NotFoundError(`Email: '${args.email}' does not exist.`);
+    throw new NotFoundError(`Email: '${args.input.email}' does not exist.`);
   }
 
-  if (!(await comparePassword(args.password, existentUser.password))) {
+  if (!(await comparePassword(args.input.password, existentUser.password))) {
     throw new UnauthorizedError(`Password incorrect.`);
   }
 
-  return { user: existentUser, token: generateToken(existentUser) };
+  return { user: existentUser, token: generateToken(existentUser, args.input.rememberMe) };
 }
 
 async function createUser(parent: any, args: { input: UserInput }) {
