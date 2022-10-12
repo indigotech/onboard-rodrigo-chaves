@@ -1,5 +1,6 @@
 import { AxiosInstance } from 'axios';
 import { UserInput } from '../src/inputs/user-input';
+import { LoginInput } from './inputs/login-input';
 import { queryUserQL, mutationCreateUserQL, mutationLoginQL } from './queriesQL';
 
 export async function queryUser(connection: AxiosInstance) {
@@ -17,10 +18,10 @@ export async function mutationCreateUser(connection: AxiosInstance, newUser: Use
   return result.data;
 }
 
-export async function mutationLogin(connection: AxiosInstance, email: string, password: string) {
+export async function mutationLogin(connection: AxiosInstance, input: LoginInput) {
   const result = await connection.post('/graphql', {
     query: mutationLoginQL,
-    variables: { email, password },
+    variables: { input },
   });
 
   return result.data;

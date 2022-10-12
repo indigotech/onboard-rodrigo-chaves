@@ -112,7 +112,8 @@ describe('Login Mutation Test', () => {
     await mutationCreateUser(connection, mochaUser);
     const userInDatabase = await AppDataSource.getRepository(User).findOneBy({ email: mochaUser.email });
 
-    const loginResult = (await mutationLogin(connection, mochaUser.email, mochaUser.password)).data.login;
+    const loginResult = (await mutationLogin(connection, { email: mochaUser.email, password: mochaUser.password })).data
+      .login;
 
     expect(loginResult.user).to.be.deep.eq({
       id: userInDatabase.id,
@@ -126,8 +127,9 @@ describe('Login Mutation Test', () => {
   });
 
   it('Should return an error when trying to login with a non-existent email', async () => {
-    const apolloErrors = (await mutationLogin(connection, 'mochauserNotExistent@email.com', 'SomePassword1'))
-      .errors as ApolloErrorFormat[];
+    const apolloErrors = (
+      await mutationLogin(connection, { email: 'mochauserNotExistent@email.com', password: 'SomePassword1' })
+    ).errors as ApolloErrorFormat[];
 
     const notFoundError = new NotFoundError('');
     const emailNotFoundError = apolloErrors.find(
@@ -145,7 +147,7 @@ describe('Login Mutation Test', () => {
   it('Should return an error when trying to login with an incorrect password', async () => {
     await mutationCreateUser(connection, mochaUser);
 
-    const apolloErrors = (await mutationLogin(connection, mochaUser.email, 'mochauserPassword123'))
+    const apolloErrors = (await mutationLogin(connection, { email: mochaUser.email, password: 'mochauserPassword123' }))
       .errors as ApolloErrorFormat[];
 
     const unauthorizedError = new UnauthorizedError('');
