@@ -4,6 +4,14 @@ import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { resolvers } from './resolvers';
 import { GraphQLError } from 'graphql';
 import { BackEndError } from './errors/backed-end.error';
+import { verifyToken } from './jwt-utils';
+
+function context({ req }) {
+  const token = req.headers.authorization || '';
+  const user = verifyToken(token);
+
+  return { user: user?.payload };
+}
 
 function formatError(error: GraphQLError) {
   const errorObj = {
@@ -34,6 +42,7 @@ export async function initApolloServer() {
     cache: 'bounded',
     plugins: [ApolloServerPluginLandingPageLocalDefault({ embed: true })],
     formatError,
+    context,
   });
 
   const serverInfo = await server.listen({ port: process.env.APOLLO_SERVER_PORT || 4000 });

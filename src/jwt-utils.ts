@@ -1,4 +1,5 @@
 import jwt, { Secret } from 'jsonwebtoken';
+import { User } from './entity/User';
 
 export function generateToken(payload: string | object | Buffer, extendDuration: boolean) {
   const expirationTimeInSeconds = 60 * 15;
@@ -9,5 +10,5 @@ export function generateToken(payload: string | object | Buffer, extendDuration:
 }
 
 export function verifyToken(token: string) {
-  return jwt.verify(token, process.env.JWT_KEY as Secret) as { payload: string };
+  return jwt.verify(token, process.env.JWT_KEY as Secret) as { payload: User };
 }

@@ -18,6 +18,8 @@ export async function login(parent: any, args: { input: LoginInput }) {
     throw new UnauthorizedError(errorMessages.passwordIncorrect);
   }
 
+  delete existentUser.password;
+
   const token = generateToken(existentUser, args.input.rememberMe);
 
   return { user: existentUser, token };
