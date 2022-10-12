@@ -9,8 +9,8 @@ import { User } from '../src/entity/User';
 import { comparePassword } from '../src/encryptPassword';
 import { mutationCreateUser, queryUser } from './queries';
 import { UserInput } from './resolvers';
-import { ExistentEmailError } from '../src/errors/ExistentEmailError';
-import { PasswordInvalidError } from '../src/errors/PasswordInvalidError';
+import { ConflictError } from './errors/conflict.error';
+import { BadRequestError } from './errors/bad-request.error';
 
 interface ApolloErrorFormat {
   message: string;
@@ -79,7 +79,7 @@ describe('CreateUser Mutation Test', () => {
 
     await mutationCreateUser(connection, input);
     const apolloErrors = (await mutationCreateUser(connection, input)).errors as ApolloErrorFormat[];
-    const mailError = new ExistentEmailError('');
+    const mailError = new ConflictError('');
     const hasDuplicatedEmailError = apolloErrors.some((error) => error.code === mailError.code);
 
     expect(apolloErrors.length).to.be.gt(0);
@@ -99,7 +99,7 @@ describe('CreateUser Mutation Test', () => {
     };
 
     const apolloErrors = (await mutationCreateUser(connection, input)).errors as ApolloErrorFormat[];
-    const passwordError = new PasswordInvalidError('');
+    const passwordError = new BadRequestError('');
     const hasInvalidPasswordError = apolloErrors.some((error) => error.code === passwordError.code);
 
     expect(apolloErrors.length).to.be.gt(0);

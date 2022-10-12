@@ -3,8 +3,8 @@ import { ApolloServer } from 'apollo-server';
 import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { resolvers } from './resolvers';
 import { GraphQLError } from 'graphql';
-import { ExistentEmailError } from './errors/ExistentEmailError';
-import { PasswordInvalidError } from './errors/PasswordInvalidError';
+import { ConflictError } from './errors/conflict.error';
+import { BadRequestError } from './errors/bad-request.error';
 
 function formatError(error: GraphQLError) {
   const errorObj = {
@@ -13,7 +13,7 @@ function formatError(error: GraphQLError) {
     details: '',
   };
 
-  if (error.originalError instanceof ExistentEmailError || error.originalError instanceof PasswordInvalidError) {
+  if (error.originalError instanceof ConflictError || error.originalError instanceof BadRequestError) {
     errorObj.message = error.message;
     errorObj.code = error.originalError.code;
 
