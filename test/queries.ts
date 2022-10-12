@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios';
-import { UserInput } from './resolvers';
+import { LoginInput, UserInput } from './resolvers';
 
 export async function queryUser(connection: AxiosInstance) {
   const query = `query User{
@@ -34,9 +34,9 @@ export async function mutationCreateUser(connection: AxiosInstance, newUser: Use
   return result.data;
 }
 
-export async function mutationLogin(connection: AxiosInstance, email: string, password: string) {
-  const query = `mutation Login($email: String!, $password: String!) {
-                    login(email: $email, password: $password) {
+export async function mutationLogin(connection: AxiosInstance, input: LoginInput) {
+  const query = `mutation Login($input: LoginInput) {
+                    login(input: $input) {
                       user {
                         id
                         name
@@ -49,7 +49,7 @@ export async function mutationLogin(connection: AxiosInstance, email: string, pa
 
   const result = await connection.post('/graphql', {
     query,
-    variables: { email, password },
+    variables: { input },
   });
 
   return result.data;

@@ -116,7 +116,7 @@ describe('Login Mutation Test', () => {
     await mutationCreateUser(connection, input);
     const userInDatabase = await AppDataSource.getRepository(User).findOneBy({ email: input.email });
 
-    const loginResult = (await mutationLogin(connection, input.email, input.password)).data.login;
+    const loginResult = (await mutationLogin(connection, { email: input.email, password: input.password })).data.login;
 
     expect(loginResult.user).to.be.deep.eq({
       id: userInDatabase.id,
@@ -134,8 +134,9 @@ describe('Login Mutation Test', () => {
   });
 
   it('Should return an error when trying to login with a non-existent email', async () => {
-    const apolloErrors = (await mutationLogin(connection, 'mochauserNotExistent@email.com', 'SomePassword1'))
-      .errors as ApolloErrorFormat[];
+    const apolloErrors = (
+      await mutationLogin(connection, { email: 'mochauserNotExistent@email.com', password: 'SomePassword1' })
+    ).errors as ApolloErrorFormat[];
 
     const mailNotFoundError = new NotFoundError('');
     const hasNotFoundEmailError = apolloErrors.some((error) => error.code === mailNotFoundError.code);
@@ -154,7 +155,7 @@ describe('Login Mutation Test', () => {
 
     await mutationCreateUser(connection, input);
 
-    const apolloErrors = (await mutationLogin(connection, input.email, 'mochauserPassword123'))
+    const apolloErrors = (await mutationLogin(connection, { email: input.email, password: 'mochauserPassword123' }))
       .errors as ApolloErrorFormat[];
 
     const passwordIncorrectError = new UnauthorizedError('');

@@ -17,7 +17,7 @@ export interface UserInput {
 export interface LoginInput {
   email: string;
   password: string;
-  rememberMe: boolean;
+  rememberMe?: boolean;
 }
 
 async function validateInputs(email: string, password: string) {
