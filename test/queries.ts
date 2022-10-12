@@ -9,11 +9,17 @@ export async function queryUser(connection: AxiosInstance) {
   return result.data;
 }
 
-export async function mutationCreateUser(connection: AxiosInstance, newUser: UserInput) {
-  const result = await connection.post('/graphql', {
+export async function mutationCreateUser(connection: AxiosInstance, newUser: UserInput, token: string) {
+  const data = {
     query: mutationCreateUserQL,
     variables: { input: newUser },
-  });
+  };
+
+  const headers = {
+    Authorization: token,
+  };
+
+  const result = await connection.post('/graphql', data, { headers });
 
   return result.data;
 }
