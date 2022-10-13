@@ -1,9 +1,7 @@
-export class ConflictError extends Error {
-  public details?: string;
-  public readonly code: number;
+import { BackEndError } from './backed-end.error';
 
+export class ConflictError extends BackEndError {
   constructor(message: string) {
-    super(message);
-    this.code = 409;
+    super(message, 409);
   }
 }

@@ -1,9 +1,7 @@
-export class BadRequestError extends Error {
-  public details?: string;
-  public readonly code: number;
+import { BackEndError } from './backed-end.error';
 
+export class BadRequestError extends BackEndError {
   constructor(message: string) {
-    super(message);
-    this.code = 400;
+    super(message, 400);
   }
 }

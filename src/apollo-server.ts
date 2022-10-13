@@ -3,8 +3,7 @@ import { ApolloServer } from 'apollo-server';
 import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { resolvers } from './resolvers';
 import { GraphQLError } from 'graphql';
-import { ConflictError } from './errors/conflict.error';
-import { BadRequestError } from './errors/bad-request.error';
+import { BackEndError } from './errors/backed-end.error';
 
 function formatError(error: GraphQLError) {
   const errorObj = {
@@ -13,7 +12,7 @@ function formatError(error: GraphQLError) {
     details: '',
   };
 
-  if (error.originalError instanceof ConflictError || error.originalError instanceof BadRequestError) {
+  if (error.originalError instanceof BackEndError) {
     errorObj.message = error.message;
     errorObj.code = error.originalError.code;
 
