@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios';
-import { UserInput } from './inputs/user-input';
+import { UserInput } from '../src/inputs/user-input';
 
 export async function queryUser(connection: AxiosInstance) {
   const query = `query User{
