@@ -8,9 +8,9 @@ import { AppDataSource } from '../src/data-source';
 import { User } from '../src/entity/User';
 import { comparePassword } from '../src/encryptPassword';
 import { mutationCreateUser, queryUser } from './queries';
-import { UserInput } from './resolvers';
-import { ConflictError } from './errors/conflict.error';
-import { BadRequestError } from './errors/bad-request.error';
+import { ConflictError } from '../src/errors/conflict.error';
+import { BadRequestError } from '../src/errors/bad-request.error';
+import { UserInput } from './inputs/user-input';
 
 interface ApolloErrorFormat {
   message: string;
