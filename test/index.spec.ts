@@ -70,7 +70,22 @@ describe('CreateUser Mutation Test', () => {
     });
   });
 
-  it('Should give an error when creating a user with an already existent email', async () => {
+  it('Should give an error when trying to create a user without being logged', async () => {
+    const apolloErrors = (await mutationCreateUser(connection, mochaUser, undefined)).errors as ApolloErrorFormat[];
+    const unauthorizedError = new UnauthorizedError('');
+    const notAuthenticatedError = apolloErrors.find(
+      (error) => error.code === unauthorizedError.code && error.message === errorMessages.notAuthenticated,
+    );
+
+    expect(apolloErrors.length).to.be.gt(0);
+    expect(notAuthenticatedError).to.be.deep.eq({
+      code: unauthorizedError.code,
+      details: '',
+      message: errorMessages.notAuthenticated,
+    });
+  });
+
+  it('Should give an error when creating a user with an already existing email', async () => {
     const loginResult = (await mutationLogin(connection, { email: 'test@email.com', password: 'Teste1' })).data.login;
 
     await mutationCreateUser(connection, mochaUser, loginResult.token);
@@ -137,9 +152,9 @@ describe('Login Mutation Test', () => {
     expect(loginResult.token.length).to.be.gt(0);
   });
 
-  it('Should return an error when trying to login with a non-existent email', async () => {
+  it('Should return an error when trying to login with a non-existing email', async () => {
     const apolloErrors = (
-      await mutationLogin(connection, { email: 'mochauserNotExistent@email.com', password: 'SomePassword1' })
+      await mutationLogin(connection, { email: 'mochauserNotExisting@email.com', password: 'SomePassword1' })
     ).errors as ApolloErrorFormat[];
 
     const notFoundError = new NotFoundError('');

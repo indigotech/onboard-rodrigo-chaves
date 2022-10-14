@@ -11,11 +11,11 @@ export function context({ req }) {
     try {
       userId = verifyToken(token);
     } catch (error) {
-      throw new GraphQLError(errorMessages.tokenInvalidOrExpired, {
-        originalError: new UnauthorizedError(errorMessages.notAuthenticated),
-      });
+      const originalError = new UnauthorizedError(errorMessages.notAuthenticated);
+
+      throw new GraphQLError(errorMessages.tokenInvalidOrExpired, { originalError });
     }
   }
 
-  return userId;
+  return { userId };
 }

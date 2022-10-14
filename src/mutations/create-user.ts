@@ -6,8 +6,8 @@ import { UnauthorizedError } from '../errors/unauthorized.error';
 import { UserInput } from '../inputs/user-input';
 import { validateInputs } from '../inputs/validate-user-input';
 
-export async function createUser(parent: any, args: { input: UserInput }, context: string) {
-  if (!context) {
+export async function createUser(parent: any, args: { input: UserInput }, context: { userId: string }) {
+  if (!context.userId) {
     throw new UnauthorizedError(errorMessages.notAuthenticated);
   }
 
