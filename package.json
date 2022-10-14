@@ -4,10 +4,10 @@
    "description": "Projeto de backend no onBoard da TaqTile",
    "main": "index.js",
    "scripts": {
-      "start": "set TEST=false && ts-node src/index.ts",
+      "start": "ts-node src/index.ts",
       "build": "tsc",
       "lint": "eslint src/**",
-      "test": "set TEST=true && mocha -r ts-node/register test/**/*.spec.ts"
+      "test": "mocha -r ts-node/register test/**/*.spec.ts --exit"
    },
    "repository": {
       "type": "git",
