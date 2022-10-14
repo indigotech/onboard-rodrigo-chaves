@@ -16,8 +16,8 @@ export const mutationCreateUserQL = `mutation CreateUser($input: UserInput){
                 }
               }`;
 
-export const mutationLoginQL = `mutation Login($email: String!, $password: String!) {
-            login(email: $email, password: $password) {
+export const mutationLoginQL = `mutation Login($input: LoginInput) {
+            login(input: $input) {
               user {
                 id
                 name
