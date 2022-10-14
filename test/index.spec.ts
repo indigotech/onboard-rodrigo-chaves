@@ -8,14 +8,20 @@ import { AppDataSource } from '../src/data-source';
 import { User } from '../src/entity/User';
 import { comparePassword } from '../src/encryptPassword';
 import { mutationCreateUser, queryUser } from './queries';
-import { UserInput } from './resolvers';
-import { ExistentEmailError } from '../src/errors/ExistentEmailError';
-import { PasswordInvalidError } from '../src/errors/PasswordInvalidError';
+import { ConflictError } from '../src/errors/conflict.error';
+import { BadRequestError } from '../src/errors/bad-request.error';
+import { UserInput } from '../src/inputs/user-input';
+import { errorMessages } from '../src/errors/error-messages';
 
 interface ApolloErrorFormat {
   message: string;
   code: number;
   details: string;
+}
+
+interface ApolloErrorFormat {
+  message: string;
+  extensions: { code: string };
 }
 
 const connection = axios.create({ baseURL: `http://localhost:${process.env.APOLLO_SERVER_PORT}` });
@@ -46,10 +52,10 @@ describe('CreateUser Mutation Test', () => {
 
     const isSamePassword = await comparePassword(input.password, userInDatabase.password);
 
+    expect(isSamePassword).to.be.true;
     expect(userInDatabase.id).to.be.gt(0);
     expect(userInDatabase.name).to.be.eq(input.name);
     expect(userInDatabase.email).to.be.eq(input.email);
-    expect(isSamePassword).to.be.true;
     expect(userInDatabase.birthdate).to.be.eq(input.birthdate);
 
     expect(createdUser).to.be.deep.eq({
@@ -74,11 +80,17 @@ describe('CreateUser Mutation Test', () => {
 
     await mutationCreateUser(connection, input);
     const apolloErrors = (await mutationCreateUser(connection, input)).errors as ApolloErrorFormat[];
-    const mailError = new ExistentEmailError('');
-    const hasDuplicatedEmailError = apolloErrors.some((error) => error.code === mailError.code);
+    const mailError = new ConflictError('');
+    const duplicatedEmailError = apolloErrors.find(
+      (error) => error.code === mailError.code && error.message === errorMessages.duplicatedEmail,
+    );
 
     expect(apolloErrors.length).to.be.gt(0);
-    expect(hasDuplicatedEmailError).to.be.true;
+    expect(duplicatedEmailError).to.be.deep.eq({
+      code: mailError.code,
+      details: '',
+      message: errorMessages.duplicatedEmail,
+    });
 
     after(async () => {
       await AppDataSource.getRepository(User).delete({ email: input.email });
@@ -94,10 +106,50 @@ describe('CreateUser Mutation Test', () => {
     };
 
     const apolloErrors = (await mutationCreateUser(connection, input)).errors as ApolloErrorFormat[];
-    const passwordError = new PasswordInvalidError('');
-    const hasInvalidPasswordError = apolloErrors.some((error) => error.code === passwordError.code);
+    const passwordError = new BadRequestError('');
+    const invalidPasswordError = apolloErrors.find(
+      (error) => error.code === passwordError.code && error.message === errorMessages.passwordInvalid,
+    );
 
     expect(apolloErrors.length).to.be.gt(0);
-    expect(hasInvalidPasswordError).to.be.true;
+    expect(invalidPasswordError).to.be.deep.eq({
+      code: passwordError.code,
+      details: '',
+      message: errorMessages.passwordInvalid,
+    });
+  });
+});
+
+//Temporary test for login, it compares to a specific return, it will be changed in the next PR's.
+describe('Login Mutation test - Return', () => {
+  it('Should return be equal input', async () => {
+    const query = `mutation($email: String!, $password: String!) {
+      login(email: $email, password: $password) {
+        user {
+          id
+          name
+          email
+          birthdate
+        },
+        token
+      }
+    }`;
+
+    const email = 'mochauser@email.com';
+    const password = 'mochauserPassword1';
+
+    const result = await connection.post('/graphql', {
+      query,
+      variables: { email, password },
+    });
+
+    const loginResponse = {
+      id: 12,
+      name: 'Rodrigo',
+      email: 'rodrigo@email.com',
+      birthdate: '01-01-1980',
+    };
+
+    expect(JSON.stringify(result.data.data.login.user)).to.be.equal(JSON.stringify(loginResponse));
   });
 });

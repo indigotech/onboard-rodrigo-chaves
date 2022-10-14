@@ -19,3 +19,4 @@ testdb:
     - POSTGRES_USER=onboardRodrigoTest
     - POSTGRES_PASSWORD=onboardRodrigoTest
     - POSTGRES_DB=onboardRodrigoTest
+    
