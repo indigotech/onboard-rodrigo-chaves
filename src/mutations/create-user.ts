@@ -6,9 +6,9 @@ import { UnauthorizedError } from '../errors/unauthorized.error';
 import { UserInput } from '../inputs/user-input';
 import { validateInputs } from '../inputs/validate-user-input';
 
-export async function createUser(parent: any, args: { input: UserInput }, context: { user: User }) {
-  if (!context.user) {
-    throw new UnauthorizedError(errorMessages.duplicatedEmail);
+export async function createUser(parent: any, args: { input: UserInput }, context: string) {
+  if (!context) {
+    throw new UnauthorizedError(errorMessages.notAuthenticated);
   }
 
   await validateInputs(args);

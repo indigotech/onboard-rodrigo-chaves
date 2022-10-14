@@ -4,14 +4,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from 'apollo-server-core';
 import { resolvers } from './resolvers';
 import { GraphQLError } from 'graphql';
 import { BackEndError } from './errors/backed-end.error';
-import { verifyToken } from './jwt-utils';
-
-function context({ req }) {
-  const token = req.headers.authorization || '';
-  const user = verifyToken(token);
-
-  return { user: user?.payload };
-}
+import { context } from './apollo-context/context';
 
 function formatError(error: GraphQLError) {
   const errorObj = {
