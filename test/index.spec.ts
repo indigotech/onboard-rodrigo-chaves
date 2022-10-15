@@ -10,5 +10,6 @@ before(async () => {
 });
 
 require('./query-tests/user-query.test.ts');
+require('./query-tests/users-query.test.ts');
 require('./mutation-tests/create-user-mutation.test.ts');
 require('./mutation-tests/login-mutation.test.ts');
