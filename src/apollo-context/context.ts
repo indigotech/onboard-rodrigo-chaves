@@ -2,9 +2,10 @@ import { GraphQLError } from 'graphql';
 import { errorMessages } from '../errors/error-messages';
 import { UnauthorizedError } from '../errors/unauthorized.error';
 import { verifyToken } from '../jwt-utils';
+import { ContextReturn } from './context-return';
 
 export function context({ req }) {
-  let userId = '';
+  let userId: string;
   const token = req.headers.authorization;
 
   if (token) {
@@ -17,5 +18,5 @@ export function context({ req }) {
     }
   }
 
-  return { userId };
+  return { userId } as ContextReturn;
 }

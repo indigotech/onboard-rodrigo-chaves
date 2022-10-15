@@ -1,0 +1,20 @@
+import { User } from '../entity/User';
+import { AppDataSource } from '../data-source';
+import { ContextReturn } from '../apollo-context/context-return';
+import { errorMessages } from '../errors/error-messages';
+import { NotFoundError } from '../errors/not-found.error';
+import { UnauthorizedError } from '../errors/unauthorized.error';
+
+export async function getUser(parent: any, args: { id: number }, context: ContextReturn) {
+  if (!context.userId) {
+    throw new UnauthorizedError(errorMessages.notAuthenticated);
+  }
+
+  const existentUser = await AppDataSource.manager.getRepository(User).findOneBy({ id: args.id });
+
+  if (!existentUser) {
+    throw new NotFoundError(errorMessages.userNotFound);
+  }
+
+  return existentUser;
+}

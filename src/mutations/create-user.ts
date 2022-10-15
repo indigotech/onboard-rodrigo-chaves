@@ -1,3 +1,4 @@
+import { ContextReturn } from '../apollo-context/context-return';
 import { AppDataSource } from '../data-source';
 import { encryptPassword } from '../encryptPassword';
 import { User } from '../entity/User';
@@ -6,7 +7,7 @@ import { UnauthorizedError } from '../errors/unauthorized.error';
 import { UserInput } from '../inputs/user-input';
 import { validateInputs } from '../inputs/validate-user-input';
 
-export async function createUser(parent: any, args: { input: UserInput }, context: { userId: string }) {
+export async function createUser(parent: any, args: { input: UserInput }, context: ContextReturn) {
   if (!context.userId) {
     throw new UnauthorizedError(errorMessages.notAuthenticated);
   }
