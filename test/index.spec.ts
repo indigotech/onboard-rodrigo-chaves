@@ -4,7 +4,7 @@ dotenv.config({ path: `${process.cwd()}/.test.env` });
 import axios from 'axios';
 import { initApolloServer } from '../src/apollo-server';
 import { AppDataSource } from '../src/data-source';
-import { userQueryTest } from './query-tests/users-query.test';
+import { userQueryTest } from './query-tests/user-query.test';
 import { createUserMutationTest } from './mutation-tests/create-user-mutation.test';
 import { loginMutationTest } from './mutation-tests/login-mutation.test';
 
@@ -22,6 +22,6 @@ before(async () => {
   await initApolloServer();
 });
 
-userQueryTest(connection);
+userQueryTest(connection, mochaUser);
 createUserMutationTest(connection, mochaUser);
 loginMutationTest(connection, mochaUser);
