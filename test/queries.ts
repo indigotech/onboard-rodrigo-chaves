@@ -25,10 +25,14 @@ export async function queryUser(id: number, token: string): Promise<GraphQLRetur
   return result.data;
 }
 
-export async function queryUsers(token: string, limit?: number): Promise<GraphQLReturn<{ users: User[] }>> {
+export async function queryUsers(
+  token: string,
+  limit?: number,
+  offset?: number,
+): Promise<GraphQLReturn<{ users: User[] }>> {
   const data = {
     query: queryUsersQL,
-    variables: { limit },
+    variables: { limit, offset },
   };
 
   const headers = {
