@@ -7,7 +7,7 @@ export interface ContextReturn {
   userId: string;
 }
 
-export function context({ req }) {
+export function context({ req }): ContextReturn {
   let userId: string;
   const token = req.headers.authorization;
 
@@ -21,5 +21,5 @@ export function context({ req }) {
     }
   }
 
-  return { userId } as ContextReturn;
+  return { userId };
 }
