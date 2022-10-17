@@ -1,9 +1,9 @@
 import { User } from '../entity/User';
 import { AppDataSource } from '../data-source';
-import { ContextReturn } from '../apollo-context/context-return';
 import { errorMessages } from '../errors/error-messages';
 import { NotFoundError } from '../errors/not-found.error';
 import { UnauthorizedError } from '../errors/unauthorized.error';
+import { ContextReturn } from '../apollo-context/context';
 
 export async function getUser(parent: any, args: { id: number }, context: ContextReturn) {
   if (!context.userId) {
