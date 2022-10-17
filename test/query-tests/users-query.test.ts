@@ -7,6 +7,7 @@ import { errorMessages } from '../../src/errors/error-messages';
 import { UnauthorizedError } from '../../src/errors/unauthorized.error';
 import { AppDataSource } from '../../src/data-source';
 import { User } from '../../src/entity/User';
+import { DEFAULT_LIMIT } from '../queries/get-users';
 
 export function usersQueryTest(connection: AxiosInstance) {
   describe('Users List Query Test', () => {
@@ -20,7 +21,7 @@ export function usersQueryTest(connection: AxiosInstance) {
         skip: 0,
         take: limit,
         order: {
-          name: 'DESC',
+          name: 'ASC',
         },
       });
 
@@ -40,21 +41,20 @@ export function usersQueryTest(connection: AxiosInstance) {
     it('Should bring a list of users with length equal to default limit option', async () => {
       const loginResult = (await mutationLogin(connection, { email: 'test@email.com', password: 'Teste1' })).data.login;
 
-      const defaultLimit = 5;
       const usersQueryResult = (await queryUsers(connection, loginResult.token)).data.users as UserInput[];
 
       const usersInDatabase = await AppDataSource.manager.getRepository(User).find({
         skip: 0,
-        take: defaultLimit,
+        take: DEFAULT_LIMIT,
         order: {
-          name: 'DESC',
+          name: 'ASC',
         },
       });
 
-      expect(usersQueryResult.length).to.be.eq(defaultLimit);
+      expect(usersQueryResult.length).to.be.eq(DEFAULT_LIMIT);
       expect(usersQueryResult.length).to.be.eq(usersInDatabase.length);
 
-      for (let index = 0; index < defaultLimit; index++) {
+      for (let index = 0; index < DEFAULT_LIMIT; index++) {
         expect(usersQueryResult[index]).to.be.deep.eq({
           id: usersInDatabase[index].id,
           name: usersInDatabase[index].name,
