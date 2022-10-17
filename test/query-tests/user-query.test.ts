@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { mutationCreateUser, mutationLogin, queryUser } from '../queries';
+import { queryUser } from '../queries';
 import { AppDataSource } from '../../src/data-source';
 import { User } from '../../src/entity/User';
 import { comparePassword } from '../../src/encryptPassword';
@@ -7,8 +7,9 @@ import { ApolloErrorFormat } from '../apollo-error-format';
 import { errorMessages } from '../../src/errors/error-messages';
 import { NotFoundError } from '../../src/errors/not-found.error';
 import { UnauthorizedError } from '../../src/errors/unauthorized.error';
-import { mochaUser } from '../mocha-user';
+import { createMochaUserEntity, mochaUser } from '../mocha-user';
 import { connection } from '../test-server-connection';
+import { generateToken } from '../../src/jwt-utils';
 
 describe('User Query Test', () => {
   afterEach(async () => {
@@ -16,12 +17,13 @@ describe('User Query Test', () => {
   });
 
   it('Should bring a user when passing a valid ID', async () => {
-    const loginResult = (await mutationLogin(connection, { email: 'test@email.com', password: 'Teste1' })).data.login;
+    const testToken = generateToken('1', false);
+    const testUser = await createMochaUserEntity();
+    const createdUser = await AppDataSource.getRepository(User).save(testUser);
 
-    const createdUser = (await mutationCreateUser(connection, mochaUser, loginResult.token)).data.createUser as User;
-    const userInDatabase = await AppDataSource.getRepository(User).findOneBy({ email: mochaUser.email });
+    const userInDatabase = await AppDataSource.getRepository(User).findOneBy({ email: testUser.email });
 
-    const userQueryResult = (await queryUser(connection, userInDatabase.id, loginResult.token)).data.user as User;
+    const userQueryResult = (await queryUser(connection, userInDatabase.id, testToken)).data.user as User;
 
     const isSamePassword = await comparePassword(mochaUser.password, userInDatabase.password);
     expect(isSamePassword).to.be.true;
@@ -53,9 +55,8 @@ describe('User Query Test', () => {
   });
 
   it('Should give an error passing an invalid/not-existing ID', async () => {
-    const loginResult = (await mutationLogin(connection, { email: 'test@email.com', password: 'Teste1' })).data.login;
-
-    const apolloErrors = (await queryUser(connection, 14500000, loginResult.token)).errors as ApolloErrorFormat[];
+    const testToken = generateToken('1', false);
+    const apolloErrors = (await queryUser(connection, 14500000, testToken)).errors as ApolloErrorFormat[];
 
     const notFoundError = new NotFoundError('');
     const userNotFoundError = apolloErrors.find(

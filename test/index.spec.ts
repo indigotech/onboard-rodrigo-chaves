@@ -9,10 +9,6 @@ before(async () => {
   await initApolloServer();
 });
 
-// userQueryTest(connection, mochaUser);
-// createUserMutationTest(connection, mochaUser);
-// loginMutationTest(connection, mochaUser);
-
 require('./query-tests/user-query.test.ts');
 require('./mutation-tests/create-user-mutation.test.ts');
 require('./mutation-tests/login-mutation.test.ts');
