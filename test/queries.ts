@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios';
 import { UserInput } from '../src/inputs/user-input';
 import { LoginInput } from './inputs/login-input';
-import { queryUserQL, mutationCreateUserQL, mutationLoginQL, queryUsersQL } from './queriesQL';
+import { queryUserQL, mutationCreateUserQL, mutationLoginQL, queryUsersQL } from './queries-ql';
 
 export async function queryUser(connection: AxiosInstance, id: number, token: string) {
   const data = {

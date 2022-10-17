@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { AxiosInstance } from 'axios';
-import { mutationLogin, queryUsers } from '../queries';
+import { queryUsers } from '../queries';
 import { UserInput } from '../../src/inputs/user-input';
 import { ApolloErrorFormat } from '../apollo-error-format';
 import { errorMessages } from '../../src/errors/error-messages';
@@ -8,14 +8,14 @@ import { UnauthorizedError } from '../../src/errors/unauthorized.error';
 import { AppDataSource } from '../../src/data-source';
 import { User } from '../../src/entity/User';
 import { DEFAULT_LIMIT } from '../queries/get-users';
+import { generateToken } from '../jwt-utils';
 
 export function usersQueryTest(connection: AxiosInstance) {
   describe('Users List Query Test', () => {
     it('Should bring a list of users with length equal to limit option passed', async () => {
-      const loginResult = (await mutationLogin(connection, { email: 'test@email.com', password: 'Teste1' })).data.login;
-
+      const testToken = generateToken('1', false);
       const limit = 35;
-      const usersQueryResult = (await queryUsers(connection, loginResult.token, limit)).data.users as UserInput[];
+      const usersQueryResult = (await queryUsers(connection, testToken, limit)).data.users as UserInput[];
 
       const usersInDatabase = await AppDataSource.manager.getRepository(User).find({
         skip: 0,
@@ -39,9 +39,8 @@ export function usersQueryTest(connection: AxiosInstance) {
     });
 
     it('Should bring a list of users with length equal to default limit option', async () => {
-      const loginResult = (await mutationLogin(connection, { email: 'test@email.com', password: 'Teste1' })).data.login;
-
-      const usersQueryResult = (await queryUsers(connection, loginResult.token)).data.users as UserInput[];
+      const testToken = generateToken('1', false);
+      const usersQueryResult = (await queryUsers(connection, testToken)).data.users as UserInput[];
 
       const usersInDatabase = await AppDataSource.manager.getRepository(User).find({
         skip: 0,
