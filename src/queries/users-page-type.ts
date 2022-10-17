@@ -1,8 +1,8 @@
-import { UserInput } from '../inputs/user-input';
+import { User } from '../entity/User';
 
 export interface UsersPage {
   total: number;
   before: number;
   after: number;
-  users: UserInput[];
+  users: User[];
 }
