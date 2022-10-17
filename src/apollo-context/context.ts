@@ -3,8 +3,12 @@ import { errorMessages } from '../errors/error-messages';
 import { UnauthorizedError } from '../errors/unauthorized.error';
 import { verifyToken } from '../jwt-utils';
 
-export function context({ req }) {
-  let userId = '';
+export interface ContextReturn {
+  userId: string;
+}
+
+export function context({ req }): ContextReturn {
+  let userId: string;
   const token = req.headers.authorization;
 
   if (token) {

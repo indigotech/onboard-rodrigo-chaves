@@ -1,10 +1,10 @@
-import { getUsers } from './queries/users';
+import { getUser } from './queries/get-user';
 import { createUser } from './mutations/create-user';
 import { login } from './mutations/login';
 
 export const resolvers = {
   Query: {
-    users: getUsers,
+    user: getUser,
   },
   Mutation: {
     createUser,
