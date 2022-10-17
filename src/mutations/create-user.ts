@@ -1,10 +1,16 @@
 import { AppDataSource } from '../data-source';
 import { encryptPassword } from '../encryptPassword';
 import { User } from '../entity/User';
+import { errorMessages } from '../errors/error-messages';
+import { UnauthorizedError } from '../errors/unauthorized.error';
 import { UserInput } from '../inputs/user-input';
 import { validateInputs } from '../inputs/validate-user-input';
 
-export async function createUser(parent: any, args: { input: UserInput }) {
+export async function createUser(parent: any, args: { input: UserInput }, context: { userId: string }) {
+  if (!context.userId) {
+    throw new UnauthorizedError(errorMessages.notAuthenticated);
+  }
+
   await validateInputs(args);
 
   const newUser = new User();
