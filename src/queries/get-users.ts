@@ -39,12 +39,12 @@ export async function getUsers(parent: any, args: { limit?: number; index?: numb
 
   const after = usersCount - skip - limit;
 
-  const response = {
+  const response: UsersPage = {
     total: usersCount,
     before: skip,
     after: after < 0 ? 0 : after,
     users: usersList,
-  } as UsersPage;
+  };
 
   return response;
 }
