@@ -6,10 +6,10 @@ import { BadRequestError } from '../../src/errors/bad-request.error';
 import { ConflictError } from '../../src/errors/conflict.error';
 import { errorMessages } from '../../src/errors/error-messages';
 import { UnauthorizedError } from '../../src/errors/unauthorized.error';
-import { mutationLogin, mutationCreateUser } from '../queries';
-import { ApolloErrorFormat } from '../apollo-error-format';
+import { mutationCreateUser } from '../queries';
 import { mochaUser } from '../mocha-user';
 import { connection } from '../test-server-connection';
+import { generateToken } from '../../src/jwt-utils';
 
 describe('CreateUser Mutation Test', () => {
   afterEach(async () => {
@@ -17,9 +17,8 @@ describe('CreateUser Mutation Test', () => {
   });
 
   it('Should newUser inserted in database and graphql result be equal to input', async () => {
-    const loginResult = (await mutationLogin(connection, { email: 'test@email.com', password: 'Teste1' })).data.login;
-
-    const createdUser = (await mutationCreateUser(connection, mochaUser, loginResult.token)).data.createUser as User;
+    const testToken = generateToken('1', false);
+    const createdUser = (await mutationCreateUser(connection, mochaUser, testToken)).data.createUser;
     const userInDatabase = await AppDataSource.getRepository(User).findOneBy({ email: mochaUser.email });
 
     const isSamePassword = await comparePassword(mochaUser.password, userInDatabase.password);
@@ -39,7 +38,7 @@ describe('CreateUser Mutation Test', () => {
   });
 
   it('Should give an error when trying to create a user without being logged', async () => {
-    const apolloErrors = (await mutationCreateUser(connection, mochaUser, undefined)).errors as ApolloErrorFormat[];
+    const apolloErrors = (await mutationCreateUser(connection, mochaUser, undefined)).errors;
     const unauthorizedError = new UnauthorizedError('');
     const notAuthenticatedError = apolloErrors.find(
       (error) => error.code === unauthorizedError.code && error.message === errorMessages.notAuthenticated,
@@ -54,12 +53,10 @@ describe('CreateUser Mutation Test', () => {
   });
 
   it('Should give an error when creating a user with an already existing email', async () => {
-    const loginResult = (await mutationLogin(connection, { email: 'test@email.com', password: 'Teste1' })).data.login;
+    const testToken = generateToken('1', false);
+    await mutationCreateUser(connection, mochaUser, testToken);
 
-    await mutationCreateUser(connection, mochaUser, loginResult.token);
-
-    const apolloErrors = (await mutationCreateUser(connection, mochaUser, loginResult.token))
-      .errors as ApolloErrorFormat[];
+    const apolloErrors = (await mutationCreateUser(connection, mochaUser, testToken)).errors;
     const conflictError = new ConflictError('');
     const duplicatedEmailError = apolloErrors.find(
       (error) => error.code === conflictError.code && error.message === errorMessages.duplicatedEmail,
@@ -77,10 +74,9 @@ describe('CreateUser Mutation Test', () => {
     const mochaUserInvalid = Object.assign({}, mochaUser);
     mochaUserInvalid.password = 'mochauserPassword';
 
-    const loginResult = (await mutationLogin(connection, { email: 'test@email.com', password: 'Teste1' })).data.login;
+    const testToken = generateToken('1', false);
 
-    const apolloErrors = (await mutationCreateUser(connection, mochaUserInvalid, loginResult.token))
-      .errors as ApolloErrorFormat[];
+    const apolloErrors = (await mutationCreateUser(connection, mochaUserInvalid, testToken)).errors;
     const badRequestError = new BadRequestError('');
     const invalidPasswordError = apolloErrors.find(
       (error) => error.code === badRequestError.code && error.message === errorMessages.passwordInvalid,

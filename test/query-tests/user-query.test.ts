@@ -3,7 +3,6 @@ import { queryUser } from '../queries';
 import { AppDataSource } from '../../src/data-source';
 import { User } from '../../src/entity/User';
 import { comparePassword } from '../../src/encryptPassword';
-import { ApolloErrorFormat } from '../apollo-error-format';
 import { errorMessages } from '../../src/errors/error-messages';
 import { NotFoundError } from '../../src/errors/not-found.error';
 import { UnauthorizedError } from '../../src/errors/unauthorized.error';
@@ -23,7 +22,7 @@ describe('User Query Test', () => {
 
     const userInDatabase = await AppDataSource.getRepository(User).findOneBy({ email: testUser.email });
 
-    const userQueryResult = (await queryUser(connection, userInDatabase.id, testToken)).data.user as User;
+    const userQueryResult = (await queryUser(connection, userInDatabase.id, testToken)).data.user;
 
     const isSamePassword = await comparePassword(mochaUser.password, userInDatabase.password);
     expect(isSamePassword).to.be.true;
@@ -39,7 +38,7 @@ describe('User Query Test', () => {
   });
 
   it('Should give an error when executing the query without being authenticated', async () => {
-    const apolloErrors = (await queryUser(connection, 1, '')).errors as ApolloErrorFormat[];
+    const apolloErrors = (await queryUser(connection, 1, '')).errors;
 
     const unauthorizedError = new UnauthorizedError('');
     const userNotAuthenticatedError = apolloErrors.find(
@@ -56,7 +55,7 @@ describe('User Query Test', () => {
 
   it('Should give an error passing an invalid/not-existing ID', async () => {
     const testToken = generateToken('1', false);
-    const apolloErrors = (await queryUser(connection, 14500000, testToken)).errors as ApolloErrorFormat[];
+    const apolloErrors = (await queryUser(connection, 14500000, testToken)).errors;
 
     const notFoundError = new NotFoundError('');
     const userNotFoundError = apolloErrors.find(

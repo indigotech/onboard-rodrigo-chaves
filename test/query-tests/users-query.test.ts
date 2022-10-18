@@ -1,8 +1,6 @@
 import { expect } from 'chai';
 import { AxiosInstance } from 'axios';
 import { queryUsers } from '../queries';
-import { UserInput } from '../../src/inputs/user-input';
-import { ApolloErrorFormat } from '../apollo-error-format';
 import { errorMessages } from '../../src/errors/error-messages';
 import { UnauthorizedError } from '../../src/errors/unauthorized.error';
 import { AppDataSource } from '../../src/data-source';
@@ -15,7 +13,7 @@ export function usersQueryTest(connection: AxiosInstance) {
     it('Should bring a list of users with length equal to limit option passed', async () => {
       const testToken = generateToken('1', false);
       const limit = 35;
-      const usersQueryResult = (await queryUsers(connection, testToken, limit)).data.users as UserInput[];
+      const usersQueryResult = (await queryUsers(connection, testToken, limit)).data.users;
 
       const usersInDatabase = await AppDataSource.manager.getRepository(User).find({
         skip: 0,
@@ -40,7 +38,7 @@ export function usersQueryTest(connection: AxiosInstance) {
 
     it('Should bring a list of users with length equal to default limit option', async () => {
       const testToken = generateToken('1', false);
-      const usersQueryResult = (await queryUsers(connection, testToken)).data.users as UserInput[];
+      const usersQueryResult = (await queryUsers(connection, testToken)).data.users;
 
       const usersInDatabase = await AppDataSource.manager.getRepository(User).find({
         skip: 0,
@@ -64,7 +62,7 @@ export function usersQueryTest(connection: AxiosInstance) {
     });
 
     it('Should bring an error when trying to list users without being authenticated', async () => {
-      const apolloErrors = (await queryUsers(connection, undefined)).errors as ApolloErrorFormat[];
+      const apolloErrors = (await queryUsers(connection, undefined)).errors;
 
       const unauthorizedError = new UnauthorizedError('');
       const notAuthenticatedError = apolloErrors.find(
