@@ -8,7 +8,7 @@
       "build": "tsc",
       "lint": "eslint src/**",
       "test": "mocha -r ts-node/register test/**/*.spec.ts --exit",
-      "seed": "ts-node seed/populate-database.ts"
+      "seed": "ts-node seed/seed-script.ts"
    },
    "repository": {
       "type": "git",
