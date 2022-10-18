@@ -1,20 +1,16 @@
-import { AxiosInstance } from 'axios';
 import { UserInput } from '../src/inputs/user-input';
 import { ApolloErrorFormat } from './apollo-error-format';
 import { User } from './entity/User';
 import { LoginInput } from './inputs/login-input';
 import { queryUserQL, mutationCreateUserQL, mutationLoginQL, queryUsersQL } from './queries-ql';
+import { connection } from './test-server-connection';
 
 interface GraphQLReturn<T> {
   errors?: ApolloErrorFormat[];
   data?: T;
 }
 
-export async function queryUser(
-  connection: AxiosInstance,
-  id: number,
-  token: string,
-): Promise<GraphQLReturn<{ user: User }>> {
+export async function queryUser(id: number, token: string): Promise<GraphQLReturn<{ user: User }>> {
   const data = {
     query: queryUserQL,
     variables: { id },
@@ -29,11 +25,7 @@ export async function queryUser(
   return result.data;
 }
 
-export async function queryUsers(
-  connection: AxiosInstance,
-  token: string,
-  limit?: number,
-): Promise<GraphQLReturn<{ users: User[] }>> {
+export async function queryUsers(token: string, limit?: number): Promise<GraphQLReturn<{ users: User[] }>> {
   const data = {
     query: queryUsersQL,
     variables: { limit },
@@ -49,7 +41,6 @@ export async function queryUsers(
 }
 
 export async function mutationCreateUser(
-  connection: AxiosInstance,
   newUser: UserInput,
   token: string,
 ): Promise<GraphQLReturn<{ createUser: User }>> {
@@ -67,10 +58,7 @@ export async function mutationCreateUser(
   return result.data;
 }
 
-export async function mutationLogin(
-  connection: AxiosInstance,
-  input: LoginInput,
-): Promise<
+export async function mutationLogin(input: LoginInput): Promise<
   GraphQLReturn<{
     login: {
       user: User;

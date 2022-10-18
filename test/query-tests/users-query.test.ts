@@ -6,7 +6,6 @@ import { AppDataSource } from '../../src/data-source';
 import { User } from '../../src/entity/User';
 import { DEFAULT_LIMIT } from '../../src/queries/get-users';
 import { generateToken } from '../../src/jwt-utils';
-import { connection } from '../test-server-connection';
 import { populateDatabase } from '../../seed/populate-database';
 
 describe('Users List Query Test', () => {
@@ -21,7 +20,7 @@ describe('Users List Query Test', () => {
   it('Should bring a list of users with length equal to limit option passed', async () => {
     const testToken = generateToken('1', false);
     const limit = 35;
-    const usersQueryResult = (await queryUsers(connection, testToken, limit)).data.users;
+    const usersQueryResult = (await queryUsers(testToken, limit)).data.users;
 
     const usersInDatabase = await AppDataSource.manager.getRepository(User).find({
       skip: 0,
@@ -46,7 +45,7 @@ describe('Users List Query Test', () => {
 
   it('Should bring a list of users with length equal to default limit option', async () => {
     const testToken = generateToken('1', false);
-    const usersQueryResult = (await queryUsers(connection, testToken)).data.users;
+    const usersQueryResult = (await queryUsers(testToken)).data.users;
 
     const usersInDatabase = await AppDataSource.manager.getRepository(User).find({
       skip: 0,
@@ -70,7 +69,7 @@ describe('Users List Query Test', () => {
   });
 
   it('Should bring an error when trying to list users without being authenticated', async () => {
-    const apolloErrors = (await queryUsers(connection, undefined)).errors;
+    const apolloErrors = (await queryUsers(undefined)).errors;
 
     const unauthorizedError = new UnauthorizedError('');
     const notAuthenticatedError = apolloErrors.find(

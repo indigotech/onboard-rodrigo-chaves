@@ -6,7 +6,6 @@ import { UnauthorizedError } from '../../src/errors/unauthorized.error';
 import { mutationLogin } from '../queries';
 import { NotFoundError } from '../../src/errors/not-found.error';
 import { createMochaUserEntity, mochaUser } from '../mocha-user';
-import { connection } from '../test-server-connection';
 
 describe('Login Mutation Test', () => {
   afterEach(async () => {
@@ -16,8 +15,7 @@ describe('Login Mutation Test', () => {
   it('Should return be the user that has the same email from input and a token', async () => {
     const testUser = await createMochaUserEntity();
     const createdUser = await AppDataSource.getRepository(User).save(testUser);
-    const loginResult = (await mutationLogin(connection, { email: createdUser.email, password: mochaUser.password }))
-      .data.login;
+    const loginResult = (await mutationLogin({ email: createdUser.email, password: mochaUser.password })).data.login;
 
     const userInDatabase = await AppDataSource.getRepository(User).findOneBy({ email: createdUser.email });
 
@@ -33,9 +31,8 @@ describe('Login Mutation Test', () => {
   });
 
   it('Should return an error when trying to login with a non-existing email', async () => {
-    const apolloErrors = (
-      await mutationLogin(connection, { email: 'mochauserNotExisting@email.com', password: 'SomePassword1' })
-    ).errors;
+    const apolloErrors = (await mutationLogin({ email: 'mochauserNotExisting@email.com', password: 'SomePassword1' }))
+      .errors;
 
     const notFoundError = new NotFoundError('');
     const emailNotFoundError = apolloErrors.find(
@@ -54,8 +51,7 @@ describe('Login Mutation Test', () => {
     const testUser = await createMochaUserEntity();
     const createdUser = await AppDataSource.getRepository(User).save(testUser);
 
-    const apolloErrors = (await mutationLogin(connection, { email: createdUser.email, password: 'WrongPassword1' }))
-      .errors;
+    const apolloErrors = (await mutationLogin({ email: createdUser.email, password: 'WrongPassword1' })).errors;
 
     const unauthorizedError = new UnauthorizedError('');
     const passwordIncorrectError = apolloErrors.find(
