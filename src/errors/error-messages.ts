@@ -6,4 +6,5 @@ export const errorMessages = {
   tokenInvalidOrExpired: "User's token is invalid or expired, please login again.",
   notAuthenticated: 'User must be authenticated to create another user.',
   userNotFound: 'This user does not exist.',
+  invalidLimit: 'GetUsers limit argument must be greater than zero',
 };
