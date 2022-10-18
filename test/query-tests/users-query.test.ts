@@ -55,7 +55,6 @@ describe('Users List Query Test', () => {
       },
     });
 
-    expect(usersQueryResult.length).to.be.eq(DEFAULT_LIMIT);
     expect(usersQueryResult.length).to.be.eq(usersInDatabase.length);
 
     for (let index = 0; index < DEFAULT_LIMIT; index++) {
