@@ -20,12 +20,16 @@ function createRandomUser(): UserInput {
 }
 
 async function populateDatabase() {
+  const randomUsers: UserInput[] = [];
+
   for (let index = 0; index < numberOfNewUsers; index++) {
     const newUser = createRandomUser();
     newUser.password = await encryptPassword(newUser.password);
 
-    await AppDataSource.getRepository(User).save(newUser);
+    randomUsers.push(newUser);
   }
+
+  await AppDataSource.getRepository(User).save(randomUsers);
 }
 
 async function initServer() {
