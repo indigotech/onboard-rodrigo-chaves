@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { connection } from '../test-server-connection';
 import { queryUser } from '../queries';
 import { AppDataSource } from '../../src/data-source';
 import { User } from '../../src/entity/User';
@@ -7,7 +8,6 @@ import { errorMessages } from '../../src/errors/error-messages';
 import { NotFoundError } from '../../src/errors/not-found.error';
 import { UnauthorizedError } from '../../src/errors/unauthorized.error';
 import { createMochaUserEntity, mochaUser } from '../mocha-user';
-import { connection } from '../test-server-connection';
 import { generateToken } from '../../src/jwt-utils';
 
 describe('User Query Test', () => {

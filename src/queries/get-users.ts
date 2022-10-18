@@ -1,4 +1,4 @@
-import { ContextReturn } from '../apollo-context/context-return';
+import { ContextReturn } from '../apollo-context/context';
 import { AppDataSource } from '../data-source';
 import { User } from '../entity/User';
 import { BadRequestError } from '../errors/bad-request.error';

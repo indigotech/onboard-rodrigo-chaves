@@ -1,4 +1,4 @@
-export const queryUserQL = `query User($id: Int){
+export const queryUserQL = `query User($id: Int!){
     user(id: $id){
       id
       name
