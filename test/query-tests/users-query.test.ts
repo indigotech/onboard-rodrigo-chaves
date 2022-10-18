@@ -7,8 +7,17 @@ import { User } from '../../src/entity/User';
 import { DEFAULT_LIMIT } from '../../src/queries/get-users';
 import { generateToken } from '../../src/jwt-utils';
 import { connection } from '../test-server-connection';
+import { populateDatabase } from '../../seed/populate-database';
 
 describe('Users List Query Test', () => {
+  before(async () => {
+    await populateDatabase();
+  });
+
+  after(async () => {
+    await AppDataSource.manager.getRepository(User).delete({});
+  });
+
   it('Should bring a list of users with length equal to limit option passed', async () => {
     const testToken = generateToken('1', false);
     const limit = 35;
