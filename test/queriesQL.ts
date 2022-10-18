@@ -1,5 +1,5 @@
-export const queryUserQL = `query User{
-    users{
+export const queryUserQL = `query User($id: Int){
+    user(id: $id){
       id
       name
       email
