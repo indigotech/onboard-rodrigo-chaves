@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcrypt';
 
 export async function encryptPassword(password: string) {
-  const hash = await bcrypt.hash(password, 10);
+  const hash = await bcrypt.hash(password, Number(process.env.BCRYPT_ROUNDS));
   return hash;
 }
 
