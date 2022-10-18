@@ -8,30 +8,28 @@ import { UsersPage } from './users-page-type';
 
 export const DEFAULT_LIMIT = 5;
 
-export async function getUsers(parent: any, args: { limit?: number; index?: number }, context: ContextReturn) {
+export async function getUsers(parent: any, args: { limit?: number; offset?: number }, context: ContextReturn) {
   if (!context.userId) {
     throw new UnauthorizedError(errorMessages.notAuthenticated);
   }
 
-  if (args.limit <= 0) {
+  const limit = args.limit ?? DEFAULT_LIMIT;
+
+  if (limit <= 0) {
     throw new BadRequestError(errorMessages.invalidLimit);
   }
 
-  const limit = args.limit ?? DEFAULT_LIMIT;
-  const index = args.index ? args.index : 1;
+  const offset = args.offset ?? 0;
 
   const usersCount = await AppDataSource.manager.getRepository(User).count();
-  const maxIndex = Math.ceil(usersCount / limit);
+  const maxOffset = Math.ceil(usersCount / limit);
 
-  if (index > maxIndex) {
-    throw new BadRequestError(errorMessages.indexInvalid);
-  }
-
-  const skip = (index - 1) * limit;
+  const skip = offset * limit;
+  const take = offset < 0 || offset > maxOffset ? 0 : limit;
 
   const usersList = await AppDataSource.manager.getRepository(User).find({
-    skip: 0,
-    take: limit,
+    skip,
+    take,
     order: {
       name: 'ASC',
     },

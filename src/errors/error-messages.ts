@@ -4,7 +4,7 @@ export const errorMessages = {
   emailNotFound: 'This email does not exist.',
   passwordIncorrect: 'Password incorrect.',
   tokenInvalidOrExpired: "User's token is invalid or expired, please login again.",
-  notAuthenticated: 'User must be authenticated to create another user.',
+  notAuthenticated: 'User must be authenticated to execute this functionality.',
   userNotFound: 'This user does not exist.',
   invalidLimit: 'GetUsers limit argument must be greater than zero',
   indexInvalid: 'Index number too big, please choose an index number between interval.',

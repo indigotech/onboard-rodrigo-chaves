@@ -1,6 +1,6 @@
 type Query {
   user(id: Int!): User
-  users(limit: Int, index: Int): UsersPaginated
+  users(limit: Int, offset: Int): UsersPaginated
 }
 
 type Mutation {
