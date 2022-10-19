@@ -6,140 +6,184 @@ import { AppDataSource } from '../../src/data-source';
 import { User } from '../../src/entity/User';
 import { BadRequestError } from '../../src/errors/bad-request.error';
 import { generateToken } from '../../src/jwt-utils';
-import { DEFAULT_LIMIT } from '../queries/get-users';
+import { DEFAULT_LIMIT } from '../../src/queries/get-users';
+import { populateDatabase } from '../../seed/populate-database';
 
-  describe('Users List Query Test', () => {
-    it('Should bring a list of users with length equal to limit option passed', async () => {
-      const testToken = generateToken('1', false);
-      const limit = 35;
-      const usersQueryResult = (await queryUsers(testToken, limit)).data.users;
+describe('Users List Query Test', () => {
+  before(async () => {
+    await populateDatabase();
+  });
 
-      const skip = 0;
-      const totalUsersInDatabase = await AppDataSource.manager.getRepository(User).count();
-      const usersListInDatabase = await AppDataSource.manager.getRepository(User).find({
-        skip,
-        take: limit,
-        order: {
-          name: 'ASC',
-        },
-      });
+  after(async () => {
+    await AppDataSource.manager.getRepository(User).delete({});
+  });
 
-      expect(usersQueryResult.total).to.be.eq(totalUsersInDatabase);
-      expect(usersQueryResult.before).to.be.eq(skip);
-      expect(usersQueryResult.after).to.be.eq(totalUsersInDatabase - limit);
+  it('Should bring a list of users with length equal to limit option passed', async () => {
+    const testToken = generateToken('1', false);
+    const limit = 35;
+    const usersPaginated = (await queryUsers(testToken, limit)).data.users;
 
-      expect(usersQueryResult.page.length).to.be.eq(limit);
-      expect(usersQueryResult.page.length).to.be.eq(usersListInDatabase.length);
-
-      for (let index = 0; index < limit; index++) {
-        expect(usersQueryResult.page[index]).to.be.deep.eq({
-          id: usersListInDatabase[index].id,
-          name: usersListInDatabase[index].name,
-          email: usersListInDatabase[index].email,
-          birthdate: usersListInDatabase[index].birthdate,
-        });
-      }
+    const skip = 0;
+    const totalUsersInDatabase = await AppDataSource.manager.getRepository(User).count();
+    const usersListInDatabase = await AppDataSource.manager.getRepository(User).find({
+      skip,
+      take: limit,
+      order: {
+        name: 'ASC',
+      },
     });
 
-    it('Should bring a list of users with length equal to default limit option', async () => {
-      const testToken = generateToken('1', false);
+    expect(usersPaginated.total).to.be.eq(totalUsersInDatabase);
+    expect(usersPaginated.before).to.be.eq(skip);
+    expect(usersPaginated.after).to.be.eq(totalUsersInDatabase - limit);
 
-      const defaultLimit = 5;
-      const usersQueryResult = (await queryUsers(testToken)).data.users;
+    expect(usersPaginated.users.length).to.be.eq(limit);
+    expect(usersPaginated.users.length).to.be.eq(usersListInDatabase.length);
 
-      const skip = 0;
-      const totalUsersInDatabase = await AppDataSource.manager.getRepository(User).count();
-      const usersInDatabase = await AppDataSource.manager.getRepository(User).find({
-        skip,
-        take: defaultLimit,
-        order: {
-          name: 'ASC',
-        },
+    for (let index = 0; index < limit; index++) {
+      expect(usersPaginated.users[index]).to.be.deep.eq({
+        id: usersListInDatabase[index].id,
+        name: usersListInDatabase[index].name,
+        email: usersListInDatabase[index].email,
+        birthdate: usersListInDatabase[index].birthdate,
       });
     }
+  });
 
   it('Should bring a list of users with length equal to default limit option', async () => {
     const testToken = generateToken('1', false);
-    const usersQueryResult = (await queryUsers(testToken)).data.users;
+    const usersPaginated = (await queryUsers(testToken)).data.users;
 
+    const skip = 0;
+    const totalUsersInDatabase = await AppDataSource.manager.getRepository(User).count();
     const usersInDatabase = await AppDataSource.manager.getRepository(User).find({
-      skip: 0,
+      skip,
       take: DEFAULT_LIMIT,
       order: {
         name: 'ASC',
       },
     });
 
-    expect(usersQueryResult.length).to.be.eq(usersInDatabase.length);
-      expect(usersQueryResult.total).to.be.eq(totalUsersInDatabase);
-      expect(usersQueryResult.before).to.be.eq(skip);
-      expect(usersQueryResult.after).to.be.eq(totalUsersInDatabase - defaultLimit);
+    expect(usersPaginated.total).to.be.eq(totalUsersInDatabase);
+    expect(usersPaginated.before).to.be.eq(skip);
+    expect(usersPaginated.after).to.be.eq(totalUsersInDatabase - DEFAULT_LIMIT);
+    expect(usersPaginated.users.length).to.be.eq(usersInDatabase.length);
 
-      expect(usersQueryResult.page.length).to.be.eq(defaultLimit);
-      expect(usersQueryResult.page.length).to.be.eq(usersInDatabase.length);
-
-      for (let index = 0; index < DEFAULT_LIMIT; index++) {
-        expect(usersQueryResult[index]).to.be.deep.eq({
-          id: usersInDatabase[index].id,
-          name: usersInDatabase[index].name,
-          email: usersInDatabase[index].email,
-          birthdate: usersInDatabase[index].birthdate,
-        });
-      }
-    });
-
-    it('Should bring a list of users skipping an amount based on index', async () => {
-      const loginResult = (await mutationLogin(connection, { email: 'test@email.com', password: 'Teste1' })).data.login;
-
-      const limit = 10;
-      const index = 2;
-      const usersQueryResult = (await queryUsers(connection, loginResult.token, limit, index)).data.users;
-
-      const skip = limit;
-      const totalUsersInDatabase = await AppDataSource.manager.getRepository(User).count();
-      const usersInDatabase = await AppDataSource.manager.getRepository(User).find({
-        skip,
-        take: limit,
-        order: {
-          name: 'ASC',
-        },
+    for (let index = 0; index < DEFAULT_LIMIT; index++) {
+      expect(usersPaginated.users[index]).to.be.deep.eq({
+        id: usersInDatabase[index].id,
+        name: usersInDatabase[index].name,
+        email: usersInDatabase[index].email,
+        birthdate: usersInDatabase[index].birthdate,
       });
+    }
+  });
 
-      expect(usersQueryResult.total).to.be.eq(totalUsersInDatabase);
-      expect(usersQueryResult.before).to.be.eq(limit);
-      expect(usersQueryResult.after).to.be.eq(totalUsersInDatabase - limit - skip);
+  it('Should bring a list of users skipping an amount based on offset', async () => {
+    const testToken = generateToken('1', false);
 
-      expect(usersQueryResult.page.length).to.be.eq(limit);
-      expect(usersQueryResult.page.length).to.be.eq(usersInDatabase.length);
+    const limit = 10;
+    const offset = 2;
+    const usersPaginated = (await queryUsers(testToken, limit, offset)).data.users;
 
-      for (let index = 0; index < limit; index++) {
-        expect(usersQueryResult.page[index]).to.be.deep.eq({
-          id: usersInDatabase[index].id,
-          name: usersInDatabase[index].name,
-          email: usersInDatabase[index].email,
-          birthdate: usersInDatabase[index].birthdate,
-        });
-      }
+    const skip = limit * offset;
+    const totalUsersInDatabase = await AppDataSource.manager.getRepository(User).count();
+    const usersInDatabase = await AppDataSource.manager.getRepository(User).find({
+      skip,
+      take: limit,
+      order: {
+        name: 'ASC',
+      },
     });
 
-    it('Should bring an error when trying to pass an index bigger than available indexes list', async () => {
-      const loginResult = (await mutationLogin(connection, { email: 'test@email.com', password: 'Teste1' })).data.login;
+    expect(usersPaginated.total).to.be.eq(totalUsersInDatabase);
+    expect(usersPaginated.before).to.be.eq(skip);
+    expect(usersPaginated.after).to.be.eq(totalUsersInDatabase - limit - skip);
+    expect(usersPaginated.users.length).to.be.eq(usersInDatabase.length);
 
-      const apolloErrors = (await queryUsers(connection, loginResult.token, 10, 65000)).errors as ApolloErrorFormat[];
-
-      const badRequestError = new BadRequestError('');
-      const indexTooBigError = apolloErrors.find(
-        (error) => error.code === badRequestError.code && error.message === errorMessages.indexInvalid,
-      );
-
-      expect(apolloErrors.length).to.be.gt(0);
-      expect(indexTooBigError).to.be.deep.eq({
-        code: badRequestError.code,
-        details: '',
-        message: errorMessages.indexInvalid,
+    for (let index = 0; index < limit; index++) {
+      expect(usersPaginated.users[index]).to.be.deep.eq({
+        id: usersInDatabase[index].id,
+        name: usersInDatabase[index].name,
+        email: usersInDatabase[index].email,
+        birthdate: usersInDatabase[index].birthdate,
       });
+    }
+  });
+
+  it('Should bring an empty users array when trying to pass an offset too big', async () => {
+    const testToken = generateToken('1', false);
+
+    const limit = 10;
+    const offset = 65000;
+    const usersPaginated = (await queryUsers(testToken, limit, offset)).data.users;
+
+    expect(usersPaginated.users.length).to.be.eq(0);
+  });
+
+  it('Should bring an empty users array when trying to pass a negative offset', async () => {
+    const testToken = generateToken('1', false);
+
+    const limit = 10;
+    const offset = -3;
+    const usersPaginated = (await queryUsers(testToken, limit, offset)).data.users;
+
+    expect(usersPaginated.users.length).to.be.eq(0);
+  });
+
+  it('Should bring less users than limit value when limit is bigger than available users in database', async () => {
+    const testToken = generateToken('1', false);
+
+    const limit = 35;
+    const offset = 1;
+    const usersPaginated = (await queryUsers(testToken, limit, offset)).data.users;
+
+    const skip = limit * offset;
+    const totalUsersInDatabase = await AppDataSource.manager.getRepository(User).count();
+    const usersInDatabase = await AppDataSource.manager.getRepository(User).find({
+      skip,
+      take: limit,
+      order: {
+        name: 'ASC',
+      },
     });
 
+    expect(usersPaginated.total).to.be.eq(totalUsersInDatabase);
+    expect(usersPaginated.before).to.be.eq(skip);
+    expect(usersPaginated.after).to.be.eq(0);
+
+    const remainingUsers = totalUsersInDatabase - limit;
+    expect(usersPaginated.users.length).to.be.eq(remainingUsers);
+    expect(usersPaginated.users.length).to.be.eq(usersInDatabase.length);
+
+    for (let index = 0; index < remainingUsers; index++) {
+      expect(usersPaginated.users[index]).to.be.deep.eq({
+        id: usersInDatabase[index].id,
+        name: usersInDatabase[index].name,
+        email: usersInDatabase[index].email,
+        birthdate: usersInDatabase[index].birthdate,
+      });
+    }
+  });
+
+  it('Should bring an error when trying to pass a negative limit value', async () => {
+    const testToken = generateToken('1', false);
+
+    const limit = -10;
+    const apolloErrors = (await queryUsers(testToken, limit)).errors;
+
+    const badRequestError = new BadRequestError('');
+    const negativeLimitError = apolloErrors.find(
+      (error) => error.code === badRequestError.code && error.message === errorMessages.invalidLimit,
+    );
+
+    expect(apolloErrors.length).to.be.gt(0);
+    expect(negativeLimitError).to.be.deep.eq({
+      code: badRequestError.code,
+      details: '',
+      message: errorMessages.invalidLimit,
+    });
+  });
 
   it('Should bring an error when trying to list users without being authenticated', async () => {
     const apolloErrors = (await queryUsers(undefined)).errors;

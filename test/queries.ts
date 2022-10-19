@@ -3,6 +3,7 @@ import { ApolloErrorFormat } from './apollo-error-format';
 import { User } from './entity/User';
 import { LoginInput } from './inputs/login-input';
 import { queryUserQL, mutationCreateUserQL, mutationLoginQL, queryUsersQL } from './queries-ql';
+import { UsersPaginated } from './queries/users-paginated-type';
 import { connection } from './test-server-connection';
 
 interface GraphQLReturn<T> {
@@ -29,7 +30,7 @@ export async function queryUsers(
   token: string,
   limit?: number,
   offset?: number,
-): Promise<GraphQLReturn<{ users: User[] }>> {
+): Promise<GraphQLReturn<{ users: UsersPaginated }>> {
   const data = {
     query: queryUsersQL,
     variables: { limit, offset },
