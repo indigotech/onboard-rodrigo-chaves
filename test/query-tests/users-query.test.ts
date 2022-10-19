@@ -21,7 +21,7 @@ describe('Users List Query Test', () => {
   it('Should bring a list of users with length equal to limit option passed', async () => {
     const testToken = generateToken('1', false);
     const limit = 35;
-    const usersPaginated = (await queryUsers(testToken, limit)).data.users;
+    const usersPaginated = (await queryUsers(testToken, { limit })).data.users;
 
     const skip = 0;
     const totalUsersInDatabase = await AppDataSource.manager.getRepository(User).count();
@@ -52,7 +52,7 @@ describe('Users List Query Test', () => {
 
   it('Should bring a list of users with length equal to default limit option', async () => {
     const testToken = generateToken('1', false);
-    const usersPaginated = (await queryUsers(testToken)).data.users;
+    const usersPaginated = (await queryUsers(testToken, {})).data.users;
 
     const skip = 0;
     const totalUsersInDatabase = await AppDataSource.manager.getRepository(User).count();
@@ -84,7 +84,7 @@ describe('Users List Query Test', () => {
 
     const limit = 10;
     const offset = 2;
-    const usersPaginated = (await queryUsers(testToken, limit, offset)).data.users;
+    const usersPaginated = (await queryUsers(testToken, { limit, offset })).data.users;
 
     const skip = limit * offset;
     const totalUsersInDatabase = await AppDataSource.manager.getRepository(User).count();
@@ -116,7 +116,7 @@ describe('Users List Query Test', () => {
 
     const limit = 10;
     const offset = 65000;
-    const usersPaginated = (await queryUsers(testToken, limit, offset)).data.users;
+    const usersPaginated = (await queryUsers(testToken, { limit, offset })).data.users;
 
     expect(usersPaginated.users.length).to.be.eq(0);
   });
@@ -126,7 +126,7 @@ describe('Users List Query Test', () => {
 
     const limit = 10;
     const offset = -3;
-    const usersPaginated = (await queryUsers(testToken, limit, offset)).data.users;
+    const usersPaginated = (await queryUsers(testToken, { limit, offset })).data.users;
 
     expect(usersPaginated.users.length).to.be.eq(0);
   });
@@ -136,7 +136,7 @@ describe('Users List Query Test', () => {
 
     const limit = 35;
     const offset = 1;
-    const usersPaginated = (await queryUsers(testToken, limit, offset)).data.users;
+    const usersPaginated = (await queryUsers(testToken, { limit, offset })).data.users;
 
     const skip = limit * offset;
     const totalUsersInDatabase = await AppDataSource.manager.getRepository(User).count();
@@ -170,7 +170,7 @@ describe('Users List Query Test', () => {
     const testToken = generateToken('1', false);
 
     const limit = -10;
-    const apolloErrors = (await queryUsers(testToken, limit)).errors;
+    const apolloErrors = (await queryUsers(testToken, { limit })).errors;
 
     const badRequestError = new BadRequestError('');
     const negativeLimitError = apolloErrors.find(
@@ -186,7 +186,7 @@ describe('Users List Query Test', () => {
   });
 
   it('Should bring an error when trying to list users without being authenticated', async () => {
-    const apolloErrors = (await queryUsers(undefined)).errors;
+    const apolloErrors = (await queryUsers(undefined, {})).errors;
 
     const unauthorizedError = new UnauthorizedError('');
     const notAuthenticatedError = apolloErrors.find(

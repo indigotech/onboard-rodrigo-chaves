@@ -4,16 +4,17 @@ import { User } from '../entity/User';
 import { BadRequestError } from '../errors/bad-request.error';
 import { errorMessages } from '../errors/error-messages';
 import { UnauthorizedError } from '../errors/unauthorized.error';
+import { PaginationInput } from '../inputs/pagination-input';
 import { UsersPaginated } from './users-paginated-type';
 
 export const DEFAULT_LIMIT = 5;
 
-export async function getUsers(parent: any, args: { limit?: number; offset?: number }, context: ContextReturn) {
+export async function getUsers(parent: any, args: { input: PaginationInput }, context: ContextReturn) {
   if (!context.userId) {
     throw new UnauthorizedError(errorMessages.notAuthenticated);
   }
 
-  const limit = args.limit ?? DEFAULT_LIMIT;
+  const limit = args.input.limit ?? DEFAULT_LIMIT;
 
   if (limit <= 0) {
     throw new BadRequestError(errorMessages.invalidLimit);
@@ -22,7 +23,7 @@ export async function getUsers(parent: any, args: { limit?: number; offset?: num
   const usersCount = await AppDataSource.manager.getRepository(User).count();
   const maxOffset = Math.ceil(usersCount / limit);
 
-  const offset = args.offset ?? 0;
+  const offset = args.input.offset ?? 0;
 
   const skip = offset * limit;
   const take = offset < 0 || offset >= maxOffset ? 0.1 : limit;

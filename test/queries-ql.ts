@@ -7,8 +7,8 @@ export const queryUserQL = `query User($id: Int!){
     }
   }`;
 
-export const queryUsersQL = `query Users($limit: Int, $offset: Int){
-    users(limit: $limit, offset: $offset){
+export const queryUsersQL = `query Users($input: Pagination){
+    users(input: $input){
       total
       before
       after

@@ -1,6 +1,6 @@
 type Query {
   user(id: Int!): User
-  users(limit: Int, offset: Int): UsersPaginated
+  users(input: Pagination): UsersPaginated
 }
 
 type Mutation {
@@ -38,4 +38,9 @@ input LoginInput {
   email: String!
   password: String!
   rememberMe: Boolean
+}
+
+input Pagination {
+  limit: Int
+  offset: Int
 }
