@@ -111,24 +111,34 @@ describe('Users List Query Test', () => {
     }
   });
 
-  it('Should bring an empty users array when trying to pass an offset too big', async () => {
+  it('Should bring users equal to limit when trying to pass an offset too big', async () => {
     const testToken = generateToken('1', false);
 
     const limit = 10;
     const offset = 65000;
     const usersPaginated = (await queryUsers(testToken, { limit, offset })).data.users;
 
-    expect(usersPaginated.users.length).to.be.eq(0);
+    expect(usersPaginated.users.length).to.be.eq(limit);
   });
 
-  it('Should bring an empty users array when trying to pass a negative offset', async () => {
+  it('Should bring an error when trying to pass a negative offset', async () => {
     const testToken = generateToken('1', false);
 
     const limit = 10;
     const offset = -3;
-    const usersPaginated = (await queryUsers(testToken, { limit, offset })).data.users;
+    const apolloErrors = (await queryUsers(testToken, { limit, offset })).errors;
 
-    expect(usersPaginated.users.length).to.be.eq(0);
+    const badRequestError = new BadRequestError('');
+    const negativeLimitError = apolloErrors.find(
+      (error) => error.code === badRequestError.code && error.message === errorMessages.invalidOffset,
+    );
+
+    expect(apolloErrors.length).to.be.gt(0);
+    expect(negativeLimitError).to.be.deep.eq({
+      code: badRequestError.code,
+      details: '',
+      message: errorMessages.invalidOffset,
+    });
   });
 
   it('Should bring less users than limit value when limit is bigger than available users in database', async () => {
