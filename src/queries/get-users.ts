@@ -15,22 +15,26 @@ export async function getUsers(parent: any, args: { input: PaginationInput }, co
   }
 
   const limit = args.input.limit ?? DEFAULT_LIMIT;
+  const offset = args.input.offset ?? 0;
 
   if (limit <= 0) {
     throw new BadRequestError(errorMessages.invalidLimit);
   }
 
+  if (offset < 0) {
+    throw new BadRequestError(errorMessages.invalidOffset);
+  }
+
   const usersCount = await AppDataSource.manager.getRepository(User).count();
-  const maxOffset = Math.ceil(usersCount / limit);
+  let skip = offset * limit;
 
-  const offset = args.input.offset ?? 0;
-
-  const skip = offset * limit;
-  const take = offset < 0 || offset >= maxOffset ? 0.1 : limit;
+  if (skip >= usersCount) {
+    skip = 0;
+  }
 
   const users = await AppDataSource.manager.getRepository(User).find({
-    skip: skip < 0 ? 0 : skip,
-    take,
+    skip,
+    take: limit,
     order: {
       name: 'ASC',
     },
