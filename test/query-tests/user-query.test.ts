@@ -8,18 +8,25 @@ import { NotFoundError } from '../../src/errors/not-found.error';
 import { UnauthorizedError } from '../../src/errors/unauthorized.error';
 import { createMochaUserEntity, mochaUser } from '../mocha-user';
 import { generateToken } from '../../src/jwt-utils';
+import { Address } from '../../src/entity/Address';
+import { createRandomAddress } from './create-random-address';
 
 describe('User Query Test', () => {
   afterEach(async () => {
+    await AppDataSource.getRepository(Address).delete({});
     await AppDataSource.getRepository(User).delete({ email: mochaUser.email });
   });
 
-  it('Should bring a user when passing a valid ID', async () => {
+  it('Should bring a user and its addresses when passing a valid ID', async () => {
     const testToken = generateToken('1', false);
     const testUser = await createMochaUserEntity();
     const createdUser = await AppDataSource.getRepository(User).save(testUser);
 
+    const testAddresses = [createRandomAddress(createdUser), createRandomAddress(createdUser)];
+    await AppDataSource.getRepository(Address).save(testAddresses);
+
     const userInDatabase = await AppDataSource.getRepository(User).findOneBy({ email: testUser.email });
+    const addressesInDatabase = await AppDataSource.getRepository(Address).findBy({ user: createdUser });
 
     const userQueryResult = (await queryUser(userInDatabase.id, testToken)).data.user;
 
@@ -28,11 +35,13 @@ describe('User Query Test', () => {
 
     delete userQueryResult.password;
 
+    expect(userQueryResult.addresses.length).to.be.eq(testAddresses.length);
     expect(userQueryResult).to.be.deep.eq({
       id: userInDatabase.id,
       name: createdUser.name,
       email: createdUser.email,
       birthdate: createdUser.birthdate,
+      addresses: addressesInDatabase,
     });
   });
 

@@ -27,6 +27,6 @@ export class Address {
   @Column()
   state: string;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.addresses)
   user: User;
 }

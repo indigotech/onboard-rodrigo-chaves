@@ -4,6 +4,16 @@ export const queryUserQL = `query User($id: Int!){
       name
       email
       birthdate
+      addresses {
+        id
+        cep
+        street
+        streetNumber
+        complement
+        neighborhood
+        city
+        state
+      }
     }
   }`;
 
@@ -17,6 +27,16 @@ export const queryUsersQL = `query Users($input: Pagination){
         name
         email
         birthdate
+        addresses {
+          id
+          cep
+          street
+          streetNumber
+          complement
+          neighborhood
+          city
+          state
+        }
       }
     }
   }`;
