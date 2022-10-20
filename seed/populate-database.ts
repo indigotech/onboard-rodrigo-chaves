@@ -8,11 +8,11 @@ const numberOfNewUsers = 50;
 
 function createRandomUser(): User {
   const newUser = new User();
-  (newUser.name = faker.name.firstName()),
-    (newUser.email = faker.internet.email()),
-    (newUser.password = faker.word.noun() + Math.floor(Math.random() * 9)),
-    (newUser.birthdate = faker.date.birthdate().toISOString()),
-    (newUser.addresses = [createRandomAddress(newUser), createRandomAddress(newUser)]);
+  newUser.name = faker.name.firstName();
+  newUser.email = faker.internet.email();
+  newUser.password = faker.word.noun() + Math.floor(Math.random() * 9);
+  newUser.birthdate = faker.date.birthdate().toISOString();
+  newUser.addresses = [createRandomAddress(newUser), createRandomAddress(newUser)];
 
   return newUser;
 }
