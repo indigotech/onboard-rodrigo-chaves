@@ -7,5 +7,6 @@ export const errorMessages = {
   notAuthenticated: 'User must be authenticated to execute this functionality.',
   userNotFound: 'This user does not exist.',
   invalidLimit: 'GetUsers limit argument must be greater than zero',
+  invalidOffset: 'GetUsers offset argument must be a positive number',
   indexInvalid: 'Index number too big, please choose an index number between interval.',
 };

@@ -4,32 +4,37 @@ import { User } from '../entity/User';
 import { BadRequestError } from '../errors/bad-request.error';
 import { errorMessages } from '../errors/error-messages';
 import { UnauthorizedError } from '../errors/unauthorized.error';
-import { UsersPage } from './users-page-type';
+import { PaginationInput } from '../inputs/pagination-input';
+import { UsersPaginated } from './users-paginated-type';
 
 export const DEFAULT_LIMIT = 5;
 
-export async function getUsers(parent: any, args: { limit?: number; offset?: number }, context: ContextReturn) {
+export async function getUsers(parent: any, args: { input: PaginationInput }, context: ContextReturn) {
   if (!context.userId) {
     throw new UnauthorizedError(errorMessages.notAuthenticated);
   }
 
-  const limit = args.limit ?? DEFAULT_LIMIT;
+  const limit = args.input.limit ?? DEFAULT_LIMIT;
+  const offset = args.input.offset ?? 0;
 
   if (limit <= 0) {
     throw new BadRequestError(errorMessages.invalidLimit);
   }
 
-  const offset = args.offset ?? 0;
+  if (offset < 0) {
+    throw new BadRequestError(errorMessages.invalidOffset);
+  }
 
   const usersCount = await AppDataSource.manager.getRepository(User).count();
-  const maxOffset = Math.ceil(usersCount / limit);
+  let skip = offset * limit;
 
-  const skip = offset * limit;
-  const take = offset < 0 || offset > maxOffset ? 0 : limit;
+  if (skip >= usersCount) {
+    skip = 0;
+  }
 
-  const usersList = await AppDataSource.manager.getRepository(User).find({
+  const users = await AppDataSource.manager.getRepository(User).find({
     skip,
-    take,
+    take: limit,
     order: {
       name: 'ASC',
     },
@@ -37,11 +42,11 @@ export async function getUsers(parent: any, args: { limit?: number; offset?: num
 
   const after = usersCount - skip - limit;
 
-  const response: UsersPage = {
+  const response: UsersPaginated = {
     total: usersCount,
     before: skip,
     after: after < 0 ? 0 : after,
-    users: usersList,
+    users,
   };
 
   return response;

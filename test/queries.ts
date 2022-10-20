@@ -2,7 +2,9 @@ import { UserInput } from '../src/inputs/user-input';
 import { ApolloErrorFormat } from './apollo-error-format';
 import { User } from './entity/User';
 import { LoginInput } from './inputs/login-input';
+import { PaginationInput } from './inputs/pagination-input';
 import { queryUserQL, mutationCreateUserQL, mutationLoginQL, queryUsersQL } from './queries-ql';
+import { UsersPaginated } from './queries/users-paginated-type';
 import { connection } from './test-server-connection';
 
 interface GraphQLReturn<T> {
@@ -25,10 +27,13 @@ export async function queryUser(id: number, token: string): Promise<GraphQLRetur
   return result.data;
 }
 
-export async function queryUsers(token: string, limit?: number): Promise<GraphQLReturn<{ users: User[] }>> {
+export async function queryUsers(
+  token: string,
+  input: PaginationInput,
+): Promise<GraphQLReturn<{ users: UsersPaginated }>> {
   const data = {
     query: queryUsersQL,
-    variables: { limit },
+    variables: { input },
   };
 
   const headers = {

@@ -1,6 +1,6 @@
 import { User } from '../entity/User';
 
-export interface UsersPage {
+export interface UsersPaginated {
   total: number;
   before: number;
   after: number;

@@ -7,12 +7,17 @@ export const queryUserQL = `query User($id: Int!){
     }
   }`;
 
-export const queryUsersQL = `query Users($limit: Int){
-    users(limit: $limit){
-      id
-      name
-      email
-      birthdate
+export const queryUsersQL = `query Users($input: Pagination){
+    users(input: $input){
+      total
+      before
+      after
+      users {
+        id
+        name
+        email
+        birthdate
+      }
     }
   }`;
 
