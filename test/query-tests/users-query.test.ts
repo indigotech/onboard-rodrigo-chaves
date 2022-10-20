@@ -8,6 +8,7 @@ import { BadRequestError } from '../../src/errors/bad-request.error';
 import { generateToken } from '../../src/jwt-utils';
 import { DEFAULT_LIMIT } from '../../src/queries/get-users';
 import { populateDatabase } from '../../seed/populate-database';
+import { Address } from '../../src/entity/Address';
 
 describe('Users List Query Test', () => {
   before(async () => {
@@ -15,10 +16,11 @@ describe('Users List Query Test', () => {
   });
 
   after(async () => {
+    await AppDataSource.getRepository(Address).delete({});
     await AppDataSource.manager.getRepository(User).delete({});
   });
 
-  it('Should bring a list of users with length equal to limit option passed', async () => {
+  it('Should bring a list of users and their addresses with length equal to limit option passed', async () => {
     const testToken = generateToken('1', false);
     const limit = 35;
     const usersPaginated = (await queryUsers(testToken, { limit })).data.users;
@@ -30,6 +32,9 @@ describe('Users List Query Test', () => {
       take: limit,
       order: {
         name: 'ASC',
+      },
+      relations: {
+        addresses: true,
       },
     });
 
@@ -46,11 +51,12 @@ describe('Users List Query Test', () => {
         name: usersListInDatabase[index].name,
         email: usersListInDatabase[index].email,
         birthdate: usersListInDatabase[index].birthdate,
+        addresses: usersListInDatabase[index].addresses,
       });
     }
   });
 
-  it('Should bring a list of users with length equal to default limit option', async () => {
+  it('Should bring a list of users and their addresses add with length equal to default limit option', async () => {
     const testToken = generateToken('1', false);
     const usersPaginated = (await queryUsers(testToken, {})).data.users;
 
@@ -61,6 +67,9 @@ describe('Users List Query Test', () => {
       take: DEFAULT_LIMIT,
       order: {
         name: 'ASC',
+      },
+      relations: {
+        addresses: true,
       },
     });
 
@@ -75,6 +84,7 @@ describe('Users List Query Test', () => {
         name: usersInDatabase[index].name,
         email: usersInDatabase[index].email,
         birthdate: usersInDatabase[index].birthdate,
+        addresses: usersInDatabase[index].addresses,
       });
     }
   });
@@ -94,6 +104,9 @@ describe('Users List Query Test', () => {
       order: {
         name: 'ASC',
       },
+      relations: {
+        addresses: true,
+      },
     });
 
     expect(usersPaginated.total).to.be.eq(totalUsersInDatabase);
@@ -107,6 +120,7 @@ describe('Users List Query Test', () => {
         name: usersInDatabase[index].name,
         email: usersInDatabase[index].email,
         birthdate: usersInDatabase[index].birthdate,
+        addresses: usersInDatabase[index].addresses,
       });
     }
   });
@@ -141,7 +155,7 @@ describe('Users List Query Test', () => {
     });
   });
 
-  it('Should bring less users than limit value when limit is bigger than available users in database', async () => {
+  it('Should bring less users and their addresses than limit value when limit is bigger than available users in database', async () => {
     const testToken = generateToken('1', false);
 
     const limit = 35;
@@ -155,6 +169,9 @@ describe('Users List Query Test', () => {
       take: limit,
       order: {
         name: 'ASC',
+      },
+      relations: {
+        addresses: true,
       },
     });
 
@@ -172,6 +189,7 @@ describe('Users List Query Test', () => {
         name: usersInDatabase[index].name,
         email: usersInDatabase[index].email,
         birthdate: usersInDatabase[index].birthdate,
+        addresses: usersInDatabase[index].addresses,
       });
     }
   });

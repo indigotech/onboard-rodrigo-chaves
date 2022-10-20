@@ -38,6 +38,9 @@ export async function getUsers(parent: any, args: { input: PaginationInput }, co
     order: {
       name: 'ASC',
     },
+    relations: {
+      addresses: true,
+    },
   });
 
   const after = usersCount - skip - limit;

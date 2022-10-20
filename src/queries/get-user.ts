@@ -10,7 +10,10 @@ export async function getUser(parent: any, args: { id: number }, context: Contex
     throw new UnauthorizedError(errorMessages.notAuthenticated);
   }
 
-  const existentUser = await AppDataSource.manager.getRepository(User).findOneBy({ id: args.id });
+  const existentUser = await AppDataSource.getRepository(User).findOne({
+    where: { id: args.id },
+    relations: { addresses: true },
+  });
 
   if (!existentUser) {
     throw new NotFoundError(errorMessages.userNotFound);
